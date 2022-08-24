@@ -22,23 +22,16 @@ module.exports = {
   module: {
     rules: [
         {
-          test: /\.js$/,
-          exclude: /(node_modules)/,
-          use: ['babel-loader']
+            test: /\.js$/,
+            exclude: /(node_modules)/,
+            use: ['babel-loader']
         },
         {
           // Это правило будет применяться ко всем файлам,
           // имя которых подойдет под регулярное выражение:
           test: /\.css$/i,
           // Список лоадеров, которые применятся к файлу:
-          use: [
-            { loader: 'style-loader' },
-            {
-                loader: 'css-loader',
-                // Лоадеру можно передать параметры:
-                options: { modules: true }
-            }
-         ]
+          use: ['style-loader','css-loader']
         }
     ]
   }
