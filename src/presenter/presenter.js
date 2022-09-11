@@ -17,8 +17,10 @@ const closeDetailsView = () => {
 
 const showMovieDetails = (movie,comments) => {
   closeDetailsView();
-  const movieDetails = new MovieDetailView(movie,comments,closeDetailsView);
+  const movieDetails = new MovieDetailView(movie,comments);
   const detailsElement = movieDetails.getElement();
+  const closeButtonElement = detailsElement.querySelector('.film-details__close');
+  closeButtonElement.addEventListener('click',closeDetailsView);
   document.body.append(detailsElement);
 
   //Убрать детали по Escape

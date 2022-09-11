@@ -8,7 +8,7 @@ import {
 } from '../mock/utils.js';
 import { EMOTIONS } from '../mock/const.js';
 
-const createMovieDetailsTemplate = (movie,comments,onClose) => {
+const createMovieDetailsTemplate = (movie,comments) => {
   const {
     filmInfo
   } = movie;
@@ -21,7 +21,7 @@ const createMovieDetailsTemplate = (movie,comments,onClose) => {
 <div class="film-details__inner">
   <div class="film-details__top-container">
     <div class="film-details__close">
-      <button class="film-details__close-btn" onclick ="${onClose()}" type="button">close</button>
+      '<button class="film-details__close-btn" type="button">close</button>'
     </div>
     <div class="film-details__info-wrap">
       <div class="film-details__poster">
@@ -128,14 +128,13 @@ const createMovieDetailsTemplate = (movie,comments,onClose) => {
 
 
 export default class MovieDetailsView {
-  constructor(movie,comments, onClose) {
+  constructor(movie,comments) {
     this.movie = movie;
     this.comments = comments;
-    this.onClose = onClose;
   }
 
   getTemplate() {
-    return createMovieDetailsTemplate(this.movie,this.comments,this.onClose );
+    return createMovieDetailsTemplate(this.movie,this.comments);
   }
 
   getElement() {
