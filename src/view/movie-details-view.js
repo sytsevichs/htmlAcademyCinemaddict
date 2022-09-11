@@ -21,7 +21,7 @@ const createMovieDetailsTemplate = (movie,comments) => {
 <div class="film-details__inner">
   <div class="film-details__top-container">
     <div class="film-details__close">
-      '<button class="film-details__close-btn" type="button">close</button>'
+      <button class="film-details__close-btn" type="button">close</button>
     </div>
     <div class="film-details__info-wrap">
       <div class="film-details__poster">

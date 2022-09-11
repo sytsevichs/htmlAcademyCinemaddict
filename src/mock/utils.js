@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import { MINUTES_IN_HOUR } from './const';
 
 dayjs.extend(duration);
 
@@ -17,7 +18,7 @@ const getRandomInteger = (a = 0, b = 1) => {
 
 const formatDateToYear = (date) => dayjs(date).format('YYYY');
 const formatDateDescription = (date) => dayjs(date).format('YYYY/MM/DD HH:MM');
-const formatMinutesToTime = (minutes) => minutes < 60 ? dayjs.duration(minutes, 'minutes').format('mm[m]') : dayjs.duration(minutes, 'minutes').format('H[h] mm[m]');
+const formatMinutesToTime = (minutes) => dayjs.duration(minutes, 'minutes').format(minutes < MINUTES_IN_HOUR ? 'mm[m]' : 'H[h] mm[m]') ;
 const defineGenresDescrition = (amount) => amount === 1 ? 'Genre' : 'Genres';
 
 export {

@@ -1,5 +1,6 @@
 const MOVIES_NUMBER_DEFAULT = 5;
 const COMMENTS_NUMBER_DEFAULT = 5;
+const MINUTES_IN_HOUR = 60;
 const MOVIES_INFO = [
   {
     id: 1,
@@ -194,10 +195,15 @@ const EMOTIONS = [
 ];
 
 const MovieDescriptionLength = {
-  MIN : 0,
-  MAX : 139
+  min : 0,
+  max : 139
 };
 
+const DateGenerationData = {
+  year: 2012,
+  month: 0,
+  day: 1,
+};
 
 const comments = [
   'Cras aliquet varius magna, non porta ligula feugiat eget.',
@@ -232,9 +238,11 @@ const secondNames = [
 export {
   MOVIES_NUMBER_DEFAULT,
   COMMENTS_NUMBER_DEFAULT,
+  MINUTES_IN_HOUR,
   MOVIES_INFO,
   EMOTIONS,
   MovieDescriptionLength,
+  DateGenerationData,
   comments,
   firstNames,
   secondNames,

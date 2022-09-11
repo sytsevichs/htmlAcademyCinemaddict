@@ -6,7 +6,7 @@ const createMovieCardTemplate = (movie, comments) => {
   const {filmInfo} = movie;
   const date = formatDateToYear(filmInfo.release.date);
   const duration = formatMinutesToTime(filmInfo.runtime);
-  const description = filmInfo.description.length > 140 ? `${filmInfo.description.substr(MovieDescriptionLength.MIN,MovieDescriptionLength.MAX)}...` : filmInfo.description;
+  const description = filmInfo.description.length > MovieDescriptionLength.max ? `${filmInfo.description.substr(MovieDescriptionLength.min,MovieDescriptionLength.max)}...` : filmInfo.description;
   const commentsText = comments.length === 1 ? 'comment' : 'comments';
 
   return (`<article class="film-card">

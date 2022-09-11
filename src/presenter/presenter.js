@@ -7,6 +7,7 @@ import ShowMoreButton from '../view/show-more-button-view.js';
 import { render } from '../render.js';
 import CommentsModel from '../model/comments-model.js';
 import { isEscapeKey } from '../mock/utils.js';
+import { MOVIES_NUMBER_DEFAULT } from '../mock/const.js';
 
 const closeDetailsView = () => {
   const detailsElement = document.querySelector('.film-details');
@@ -47,10 +48,11 @@ export default class Presenter {
     render(this.movies,container);
     render(this.moviesList,this.movies.getElement());
     render(this.moviesContainer,this.moviesList.getElement());
-    for (let i = 0; i < 5; i++)
-    {
-      const movieCommentsModel = new CommentsModel(i);
-      render(new MovieCardView(this.boardMovies[i],[...movieCommentsModel.getComments()],showMovieDetails),this.moviesContainer.getElement());
-    }
+
+    Array.from({length: MOVIES_NUMBER_DEFAULT}, (a ,index) => {
+      const movieCommentsModel = new CommentsModel(index);
+      render(new MovieCardView(this.boardMovies[index],[...movieCommentsModel.getComments()],showMovieDetails),this.moviesContainer.getElement());
+    });
+
   };
 }
