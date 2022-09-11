@@ -21,7 +21,7 @@ const createMovieDetailsTemplate = (movie,comments,onClose) => {
 <div class="film-details__inner">
   <div class="film-details__top-container">
     <div class="film-details__close">
-      <button class="film-details__close-btn" onclick="${onClose()}" type="button">close</button>
+      <button class="film-details__close-btn" onclick ="${onClose()}" type="button">close</button>
     </div>
     <div class="film-details__info-wrap">
       <div class="film-details__poster">
@@ -70,7 +70,7 @@ const createMovieDetailsTemplate = (movie,comments,onClose) => {
           <tr class="film-details__row">
             <td class="film-details__term">${defineGenresDescrition(filmInfo.genre.length)}</td>
             <td class="film-details__cell">
-            ${Object.entries(filmInfo.genre).map(([genre]) => `<span class="film-details__genre">${genre}</span>`)}
+            ${Object.values(filmInfo.genre).map((genre) => `<span class="film-details__genre">${genre}</span>`)}
             </td>
           </tr>
         </table>
@@ -128,14 +128,14 @@ const createMovieDetailsTemplate = (movie,comments,onClose) => {
 
 
 export default class MovieDetailsView {
-  constructor(movie,comments,onClose) {
+  constructor(movie,comments, onClose) {
     this.movie = movie;
     this.comments = comments;
     this.onClose = onClose;
   }
 
   getTemplate() {
-    return createMovieDetailsTemplate(this.movie,this.comments,this.onClose);
+    return createMovieDetailsTemplate(this.movie,this.comments,this.onClose );
   }
 
   getElement() {

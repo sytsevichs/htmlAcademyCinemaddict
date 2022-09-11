@@ -32,7 +32,7 @@ const createMovieCardTemplate = (movie, comments) => {
 
 
 export default class MovieCardView {
-  constructor(movie,comments,onDetails) {
+  constructor(movie, comments, onDetails) {
     this.movie = movie;
     this.comments = comments;
     this.onDetails = onDetails;

@@ -7,6 +7,7 @@ export default class CommentsModel {
     this.movieId = movieId;
   }
 
-  comments = Array.from({length: getRandomInteger(0,COMMENTS_NUMBER_DEFAULT)}, (a,index) => generateComment(index, this.movieId));
-  getComments = () => this.comments;
+  generateComments = () => Array.from({length: getRandomInteger(0,COMMENTS_NUMBER_DEFAULT)}, (a,index) => generateComment(index, this.movieId));
+
+  getComments = () => this.generateComments();
 }
