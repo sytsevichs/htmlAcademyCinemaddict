@@ -6,18 +6,19 @@ const createUserRankTemplate = () => (`<section class="header__profile profile">
   </section>`);
 
 export default class UserRankView {
+  #element;
   getTemplate() {
     return createUserRankTemplate();
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.getTemplate());
     }
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
