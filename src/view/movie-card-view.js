@@ -32,28 +32,33 @@ const createMovieCardTemplate = (movie, comments) => {
 
 
 export default class MovieCardView {
+  #element;
+  #movie;
+  #comments;
+  #onDetails;
+
   constructor(movie, comments, onDetails) {
-    this.movie = movie;
-    this.comments = comments;
-    this.onDetails = onDetails;
+    this.#movie = movie;
+    this.#comments = comments;
+    this.#onDetails = onDetails;
   }
 
   getTemplate() {
-    return createMovieCardTemplate(this.movie, this.comments);
+    return createMovieCardTemplate(this.#movie, this.#comments);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-      this.element.querySelector('a').addEventListener('click', (evt) => {
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.getTemplate());
+      this.#element.querySelector('a').addEventListener('click', (evt) => {
         evt.preventDefault();
-        this.onDetails(this.movie, this.comments);
+        this.#onDetails(this.#movie, this.#comments);
       });
     }
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
