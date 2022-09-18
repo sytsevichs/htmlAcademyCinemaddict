@@ -8,6 +8,7 @@ import { render } from '../render.js';
 import CommentsModel from '../model/comments-model.js';
 import { isEscapeKey } from '../mock/utils.js';
 import { MOVIES_NUMBER_PER_STEP } from '../mock/const.js';
+import MoviesListMesssageView from '../view/movies-list-message-view.js';
 
 const closeDetailsView = () => {
   const bodyElement = document.querySelector('body');
@@ -54,6 +55,7 @@ export default class Presenter {
 
     render(this.#movies,this.#boardContainer);
     render(this.#moviesList,this.#movies.element);
+    render(new MoviesListMesssageView(this.#boardMovies.length), this.#moviesList.element);
     render(this.#moviesContainer,this.#moviesList.element);
 
     Array.from({length: Math.min(this.#boardMovies.length,MOVIES_NUMBER_PER_STEP)}, (a ,index) => {
