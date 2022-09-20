@@ -1,10 +1,9 @@
 import AbstactView from '../framework/view/abstract-view.js';
+const createMovieDetailsCloseButtonTemplate = () => ('div class="film-details__close"><button class="film-details__close-btn" type="button">close</button></div>');
 
-const createShowMoreButtonTemplate = () => ('<button class="films-list__show-more">Show more</button>');
-
-export default class ShowMoreButton extends AbstactView {
+export default class MovieDetailsCloseButtomView extends AbstactView {
   get template() {
-    return createShowMoreButtonTemplate();
+    return createMovieDetailsCloseButtonTemplate();
   }
 
   setClickHandler = (callback) => {
@@ -16,4 +15,5 @@ export default class ShowMoreButton extends AbstactView {
     evt.preventDefault();
     this._callback.click();
   };
+
 }

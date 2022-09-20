@@ -2,6 +2,7 @@ const MOVIES_NUMBER_DEFAULT = 15;
 const MOVIES_NUMBER_PER_STEP = 5;
 const COMMENTS_NUMBER_DEFAULT = 5;
 const MINUTES_IN_HOUR = 60;
+
 const MOVIES_INFO = [
   {
     id: 1,

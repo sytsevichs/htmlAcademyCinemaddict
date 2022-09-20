@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstactView from '../framework/view/abstract-view.js';
 
 const createFilterNavigationTemplate = () => (`<nav class="main-navigation">
     <a href="#all" class="main-navigation__item main-navigation__item--active">All movies</a>
@@ -7,21 +7,8 @@ const createFilterNavigationTemplate = () => (`<nav class="main-navigation">
     <a href="#favorites" class="main-navigation__item">Favorites <span class="main-navigation__item-count">8</span></a>
   </nav>`);
 
-export default class FilterNavigationView {
-  #element;
-
-  getTemplate() {
+export default class FilterNavigationView extends AbstactView {
+  get template() {
     return createFilterNavigationTemplate();
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.getTemplate());
-    }
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

@@ -1,25 +1,11 @@
-import { createElement } from '../render.js';
+import AbstactView from '../framework/view/abstract-view.js';
 
 const createMoviesListExtraView = () => (
   `<section class="films-list films-list--extra">
   </section>`
 );
-
-export default class MoviesListExtraView {
-  #element;
-  getTemplate() {
+export default class MoviesListExtraView extends AbstactView {
+  get template() {
     return createMoviesListExtraView();
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.getTemplate());
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

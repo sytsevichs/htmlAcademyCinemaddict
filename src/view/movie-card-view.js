@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstactView from '../framework/view/abstract-view.js';
 import { formatDateToYear, formatMinutesToTime, defineGenresDescrition } from '../mock/utils.js';
 import { MovieDescriptionLength } from '../mock/const.js';
 
@@ -31,34 +31,27 @@ const createMovieCardTemplate = (movie, comments) => {
 };
 
 
-export default class MovieCardView {
-  #element;
+export default class MovieCardView extends AbstactView {
   #movie;
   #comments;
-  #onDetails;
 
-  constructor(movie, comments, onDetails) {
+  constructor(movie, comments) {
+    super();
     this.#movie = movie;
     this.#comments = comments;
-    this.#onDetails = onDetails;
   }
 
-  getTemplate() {
+  get template() {
     return createMovieCardTemplate(this.#movie, this.#comments);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.getTemplate());
-      this.#element.querySelector('a').addEventListener('click', (evt) => {
-        evt.preventDefault();
-        this.#onDetails(this.#movie, this.#comments);
-      });
-    }
-    return this.#element;
-  }
+  setClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('a').addEventListener('click', this.#clickHandler);
+  };
 
-  removeElement() {
-    this.#element = null;
-  }
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click(this.#movie, this.#comments);
+  };
 }
