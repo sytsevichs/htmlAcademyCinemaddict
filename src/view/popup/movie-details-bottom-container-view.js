@@ -1,5 +1,5 @@
 import AbstactView from '../../framework/view/abstract-view.js';
-import { EMOTIONS } from '../../mock/const.js';
+import { EMOTIONS } from '../../utils/const.js';
 
 const createMovieDetailsBottomContainerTemplate = (comments) => {
   const commentsText = comments.length === 1 ? 'comment' : 'comments';

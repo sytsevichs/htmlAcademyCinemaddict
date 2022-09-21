@@ -207,6 +207,13 @@ const DateGenerationData = {
   day: 1,
 };
 
+const FilterType = {
+  all: 'All movies',
+  watchlist: 'Watchlist',
+  history: 'History',
+  favorites: 'Favorites',
+};
+
 const comments = [
   'Cras aliquet varius magna, non porta ligula feugiat eget.',
   'Fusce tristique felis at fermentum pharetra.',
@@ -246,6 +253,7 @@ export {
   EMOTIONS,
   MovieDescriptionLength,
   DateGenerationData,
+  FilterType,
   comments,
   firstNames,
   secondNames,

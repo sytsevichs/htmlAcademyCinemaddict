@@ -1,4 +1,4 @@
-import { MOVIES_NUMBER_DEFAULT } from '../mock/const.js';
+import { MOVIES_NUMBER_DEFAULT } from '../utils/const.js';
 import { generateMovie } from '../mock/movie.js';
 
 export default class MoviesModel {

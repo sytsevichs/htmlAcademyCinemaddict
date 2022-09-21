@@ -1,5 +1,5 @@
-import { firstNames, secondNames,comments, EMOTIONS, DateGenerationData} from './const.js';
-import { getRandomDate, getRandomInteger } from './utils.js';
+import { firstNames, secondNames,comments, EMOTIONS, DateGenerationData} from '../utils/const.js';
+import { getRandomDate, getRandomInteger } from '../utils/utils.js';
 
 export const generateComment = (id,movieId) => ({
   id,
