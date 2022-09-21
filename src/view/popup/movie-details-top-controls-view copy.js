@@ -1,4 +1,4 @@
-import AbstactView from '../framework/view/abstract-view.js';
+import AbstactView from '../../framework/view/abstract-view.js';
 
 
 const createMovieDetailsToControlsTemplate = () => (`<section class="film-details__controls">

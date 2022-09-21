@@ -1,9 +1,9 @@
-import AbstactView from '../framework/view/abstract-view.js';
+import AbstactView from '../../framework/view/abstract-view.js';
 import {
   formatDateDescription,
   formatMinutesToTime,
   defineGenresDescrition
-} from '../mock/utils.js';
+} from '../../mock/utils.js';
 
 const createMovieDetailsTopInfoTemplate = (movie) => {
   const {
