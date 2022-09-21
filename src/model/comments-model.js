@@ -1,6 +1,6 @@
-import { COMMENTS_NUMBER_DEFAULT } from '../mock/const.js';
+import { COMMENTS_NUMBER_DEFAULT } from '../utils/const.js';
 import { generateComment } from '../mock/comment.js';
-import { getRandomInteger } from '../mock/utils.js';
+import { getRandomInteger } from '../utils/utils.js';
 
 export default class CommentsModel {
   #movieId;

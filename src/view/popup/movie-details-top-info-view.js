@@ -3,7 +3,7 @@ import {
   formatDateDescription,
   formatMinutesToTime,
   defineGenresDescrition
-} from '../../mock/utils.js';
+} from '../../utils/utils.js';
 
 const createMovieDetailsTopInfoTemplate = (movie) => {
   const {

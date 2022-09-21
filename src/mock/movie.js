@@ -1,4 +1,4 @@
-import { MOVIES_INFO } from './const.js';
+import { MOVIES_INFO } from '../utils/const.js';
 
 export const generateMovie = (id) => ({
   id,

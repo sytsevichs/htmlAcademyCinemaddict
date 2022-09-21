@@ -1,7 +1,7 @@
 
 import { render } from '../framework/render.js';
-import { isEscapeKey } from '../mock/utils.js';
-import { MOVIES_NUMBER_PER_STEP } from '../mock/const.js';
+import { isEscapeKey } from '../utils/utils.js';
+import { MOVIES_NUMBER_PER_STEP } from '../utils/const.js';
 import bodyView from '../view/body/body-view.js';
 import FilterNavigationView from '../view/filter-navigation-view.js';
 import SortView from '../view/sort-view.js';
@@ -19,6 +19,7 @@ import MovieDetailsCloseButtomView from '../view/popup/movie-details-close-butto
 import MovieDetailsTopControlsView from '../view/popup/movie-details-top-controls-view copy.js';
 import MovieDetailsInnerView from '../view/popup/movie-details-inner-view.js';
 import ShowMoreButton from '../view/show-more-button-view.js';
+import { generateFilter } from '../mock/filter.js';
 export default class Presenter {
   #bodyBuilder = new bodyView();
   #movies = new MoviesView();
@@ -30,13 +31,15 @@ export default class Presenter {
   #boardMovies;
   #renderedMoviesCount = MOVIES_NUMBER_PER_STEP;
   #detailsElement;
+  #filters;
 
   init = (container, moviesModel) => {
     this.#boardContainer = container;
     this.#moviesModel = moviesModel;
     this.#boardMovies = [...this.#moviesModel.movies];
+    this.#filters = generateFilter(this.#boardMovies);
 
-    render (new FilterNavigationView, this.#boardContainer);
+    render (new FilterNavigationView(this.#filters), this.#boardContainer);
     render (new SortView, this.#boardContainer);
     render(this.#movies,this.#boardContainer);
     render(this.#moviesList,this.#movies.element);
