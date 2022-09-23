@@ -26,24 +26,12 @@ export default class MovieDetailsTopControlsView extends AbstactView {
 
   setClickHandler = (callback) => {
     this._callback.button = callback;
-    this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#watchListHandler);
-    this.element.querySelector('.film-details__control-button--watched').addEventListener('click', this.#watchedHandler);
-    this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#favoriteHandler);
+    this.element.querySelectorAll('.film-details__control-button').forEach((button) => button.addEventListener('click', this.#handleButtonClick));
   };
 
-  #watchListHandler = (evt) => {
+  #handleButtonClick = (evt) => {
     evt.preventDefault();
-    this._callback.button(this.#controls[CONTROL_TYPES.watchlist]);
-  };
-
-  #watchedHandler = (evt) => {
-    evt.preventDefault();
-    this._callback.button(this.#controls[CONTROL_TYPES.watched]);
-  };
-
-  #favoriteHandler = (evt) => {
-    evt.preventDefault();
-    this._callback.button(this.#controls[CONTROL_TYPES.favorite]);
+    this._callback.button(this.#controls[CONTROL_TYPES[evt.target.dataset.name]]);
   };
 
 }
