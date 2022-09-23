@@ -1,5 +1,5 @@
 
-import { render,remove } from '../framework/render.js';
+import { render,remove, replace } from '../framework/render.js';
 import { MOVIES_NUMBER_PER_STEP } from '../utils/const.js';
 import { generateFilter } from '../mock/filter.js';
 import FilterNavigationView from '../view/filter-navigation-view.js';
@@ -11,6 +11,7 @@ import MoviesView from '../view/movies/movies-view.js';
 import ShowMoreButton from '../view/show-more-button-view.js';
 import MoviePresenter from './movie-presenter.js';
 import PopupPresenter from './popup-presenter.js';
+import { updateItemById } from '../utils/utils.js';
 
 export default class BoardPresenter {
   #movies = new MoviesView();
@@ -25,6 +26,7 @@ export default class BoardPresenter {
   #moviesPresenter = new Map();
   #popupPresenter;
   #popupMovieId = null;
+  #filtersNavigation = null;
 
   constructor(container, moviesModel) {
     this.#boardContainer = container;
@@ -44,7 +46,20 @@ export default class BoardPresenter {
 
   #renderFilters = () => {
     this.#filters = generateFilter(this.#boardMovies);
-    render(new FilterNavigationView(this.#filters), this.#boardContainer);
+    const prevfiltersNavigation = this.#filtersNavigation;
+    this.#filtersNavigation = new FilterNavigationView(this.#filters);
+
+    if ( prevfiltersNavigation === null || this.#filtersNavigation === null ) {
+      render(this.#filtersNavigation, this.#boardContainer);
+      return;
+    }
+
+    if (this.#boardContainer.contains(prevfiltersNavigation.element)) {
+      replace(this.#filtersNavigation, prevfiltersNavigation);
+    }
+
+    remove(prevfiltersNavigation);
+
   };
 
   #renderSorting = () => {
@@ -115,12 +130,13 @@ export default class BoardPresenter {
     this.#popupPresenter.init();
   };
 
-  #handleMovieControlChange = (id,controls) => {
-    this.#moviesPresenter.get(id).updateControls(controls);
-    if (this.#popupMovieId === id) {
+  #handleMovieControlChange = (movie,controls) => {
+    this.#moviesPresenter.get(movie.id).updateControls(controls);
+    if (this.#popupMovieId === movie.id) {
       this.#popupPresenter.updateControls(controls);
     }
+    this.#boardMovies = updateItemById(this.#boardMovies, movie);
+    this.#renderFilters();
   };
-
 
 }

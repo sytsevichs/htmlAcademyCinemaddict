@@ -99,7 +99,7 @@ export default class PopupPresenter {
   #changeMovieControl = (control) => {
     control.active = !control.active;
     this.#movie.controls = updateItemByName(this.#movie.controls, control);
-    this.#updateMovieControls(this.#movie.id, this.#movie.controls);
+    this.#updateMovieControls(this.#movie, this.#movie.controls);
   };
 
   #setEscapeListener = () => {
