@@ -235,12 +235,18 @@ const DateGenerationData = {
 };
 
 const FilterType = {
+  all: 'all',
+  watchlist: 'watchlist',
+  history: 'history',
+  favorites: 'favorites',
+};
+
+const FilterName = {
   all: 'All movies',
   watchlist: 'Watchlist',
   history: 'History',
   favorites: 'Favorites',
 };
-
 
 const comments = [
   'Cras aliquet varius magna, non porta ligula feugiat eget.',
@@ -285,6 +291,7 @@ export {
   MovieDescriptionLength,
   DateGenerationData,
   FilterType,
+  FilterName,
   comments,
   firstNames,
   secondNames,

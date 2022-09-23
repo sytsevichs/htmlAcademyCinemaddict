@@ -18,6 +18,7 @@ export default class BoardPresenter {
   #moviesList = new MoviesListView();
   #moviesContainer = new MoviesContainerView();
   #showMoreButton = new ShowMoreButton();
+  #sortComponent = new SortView();
   #boardContainer;
   #moviesModel;
   #boardMovies;
@@ -63,7 +64,7 @@ export default class BoardPresenter {
   };
 
   #renderSorting = () => {
-    render(new SortView, this.#boardContainer);
+    render(this.#sortComponent, this.#boardContainer);
   };
 
   #renderMoviesList = () => {
