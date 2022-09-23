@@ -6,7 +6,8 @@ const createMovieDetailsToControlsTemplate = (controls) => (`<section class="fil
     type="button" 
     class="film-details__control-button film-details__control-button--${control.name} ${ control.active ? `film-details__control-button--${ACTIVE_CONTROL}` : ' ' }"
     id="${control.name}"  
-    name="${control.name}">
+    name="${control.name}"
+    data-name="${control.name}">
     ${control.text}</button>`)
   }
   </section>`);
