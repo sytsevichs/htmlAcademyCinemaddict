@@ -1,4 +1,4 @@
-import AbstactView from '../framework/view/abstract-view.js';
+import AbstactView from '../../framework/view/abstract-view.js';
 
 const createMoviesListExtraView = () => (
   `<section class="films-list films-list--extra">

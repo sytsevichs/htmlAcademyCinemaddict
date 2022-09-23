@@ -1,6 +1,6 @@
-import AbstactView from '../framework/view/abstract-view.js';
-import { formatDateToYear, formatMinutesToTime, defineGenresDescrition } from '../utils/utils.js';
-import { MovieDescriptionLength } from '../utils/const.js';
+import AbstactView from '../../framework/view/abstract-view.js';
+import { formatDateToYear, formatMinutesToTime, defineGenresDescrition } from '../../utils/utils.js';
+import { MovieDescriptionLength } from '../../utils/const.js';
 
 const createMovieCardTemplate = (movie, comments) => {
   const {filmInfo} = movie;
