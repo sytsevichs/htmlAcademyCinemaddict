@@ -1,61 +1,89 @@
-import { render } from '../framework/render.js';
-import MovieDetailsSectionView from '../view/popup/movie-details-section-view.js';
-import MovieDetailsTopInfoView from '../view/popup/movie-details-top-info-view.js';
-import MovieDetailsTopContainerView from '../view/popup/movie-details-top-container-view.js';
-import MovieDetailsBottomContainerView from '../view/popup/movie-details-bottom-container-view.js';
-import MovieDetailsCloseButtomView from '../view/popup/movie-details-close-button-view.js';
-import MovieDetailsTopControlsView from '../view/popup/movie-details-top-controls-view copy.js';
-import MovieDetailsInnerView from '../view/popup/movie-details-inner-view.js';
-import bodyView from '../view/body/body-view.js';
-import { isEscapeKey } from '../utils/utils.js';
-
+import { remove, render, replace } from '../framework/render.js';
+import MovieCardView from '../view/movies/movie-card-view.js';
+import CommentsModel from '../model/comments-model.js';
+import MovieCardContainerView from '../view/movies/movie-card-container-view.js';
+import MovieCardControlsView from '../view/movies/movie-card-controls-view.js';
+import { updateItemByName } from '../utils/utils.js';
 export default class MoviePresenter {
   #movie;
-  #comments;
-  #detailsElement;
-  #bodyBuilder = new bodyView();
+  #container;
+  #showMovieDetails;
+  #updateMovieControls;
+  #movieCardContainer = new MovieCardContainerView();
+  #movieCommentsModel;
+  #movieComments;
+  #movieCardView = null;
+  #movieCardControlsView = null;
 
-  constructor(movie,comments) {
+  constructor(movie, container,showMovieDetails,updateMovieControls) {
     this.#movie = movie;
-    this.#comments = comments;
+    this.#container = container;
+    this.#showMovieDetails = showMovieDetails;
+    this.#updateMovieControls = updateMovieControls;
   }
 
   init = () => {
-    this.#closeDetailsView();
-    const movieDetailsSection = new MovieDetailsSectionView;
-    const movieDetailsInnerView = new MovieDetailsInnerView;
-    const movieDetailsTopContainer = new MovieDetailsTopContainerView;
-    const movieDetailsBottomContainer = new MovieDetailsBottomContainerView(this.#comments);
-    const movieDetailsCloseButton = new MovieDetailsCloseButtomView;
-    const movieDetailsTopInfo = new MovieDetailsTopInfoView(this.#movie);
-    const movieDetailsTopControls = new MovieDetailsTopControlsView;
 
-    render(movieDetailsCloseButton, movieDetailsTopInfo.element);
-    render(movieDetailsTopInfo, movieDetailsTopContainer.element);
-    render(movieDetailsTopControls, movieDetailsTopContainer.element);
-    render(movieDetailsTopContainer, movieDetailsInnerView.element);
-    render(movieDetailsBottomContainer, movieDetailsInnerView.element);
-    render(movieDetailsInnerView, movieDetailsSection.element);
+    this.#generateComments(this.#movie.id);
 
-    movieDetailsCloseButton.setClickHandler(this.#closeDetailsView);
-    this.#detailsElement = movieDetailsSection.element;
-    this.#bodyBuilder.element.appendChild(this.#detailsElement);
-    this.#bodyBuilder.show();
-
-    //Убрать детали по Escape
-    document.addEventListener('keydown', (evt) => {
-      if (isEscapeKey(evt)) {
-        evt.preventDefault();
-        this.#closeDetailsView();
-      }
-    });
+    this.#renderData(this.#movieCardContainer.element);
+    this.#renderControls(this.#movieCardContainer.element);
+    render(this.#movieCardContainer,this.#container);
   };
 
-  #closeDetailsView = () => {
-    if (this.#detailsElement) {
-      this.#detailsElement.remove();
-      this.#bodyBuilder.hide();
+  destroy = () => {
+    remove(this.#movieCardView);
+    remove(this.#movieCardControlsView);
+    remove(this.#movieCardContainer);
+  };
+
+  updateControls = () => {
+    this.#renderControls(this.#movieCardContainer.element);
+  };
+
+  #generateComments = (id) => {
+    this.#movieCommentsModel = new CommentsModel(id);
+    this.#movieComments = [... this.#movieCommentsModel.comments];
+  };
+
+  #renderData = (container) => {
+    const prevMovieCardView = this.#movieCardView;
+    this.#movieCardView = new MovieCardView(this.#movie, this.#movieComments );
+
+    if ( prevMovieCardView === null || this.#movieCardView === null ) {
+      this.#movieCardView.setClickHandler(this.#showMovieDetails);
+      render(this.#movieCardView,container);
+      return;
     }
+
+    if (container.contains(prevMovieCardView.element)) {
+      replace(this.#movieCardView, prevMovieCardView);
+    }
+
+    remove(prevMovieCardView);
+  };
+
+  #renderControls = (container) => {
+    const prevMovieCardControlsView = this.#movieCardControlsView;
+    this.#movieCardControlsView = new MovieCardControlsView(this.#movie.controls);
+    this.#movieCardControlsView.setClickHandler(this.#changeMovieControl);
+
+    if ( prevMovieCardControlsView === null || this.#movieCardControlsView === null ) {
+      render(this.#movieCardControlsView,container);
+      return;
+    }
+
+    if (container.contains(prevMovieCardControlsView.element)) {
+      replace(this.#movieCardControlsView, prevMovieCardControlsView);
+    }
+
+    remove(prevMovieCardControlsView);
+  };
+
+  #changeMovieControl = (control) => {
+    control.active = !control.active;
+    this.#movie.controls = updateItemByName(this.#movie.controls, control);
+    this.#updateMovieControls(this.#movie.id, this.#movie.controls);
   };
 
 }

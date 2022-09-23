@@ -21,6 +21,28 @@ const formatDateDescription = (date) => dayjs(date).format('YYYY/MM/DD HH:MM');
 const formatMinutesToTime = (minutes) => dayjs.duration(minutes, 'minutes').format(minutes < MINUTES_IN_HOUR ? 'mm[m]' : 'H[h] mm[m]') ;
 const defineGenresDescrition = (amount) => amount === 1 ? 'Genre' : 'Genres';
 
+const updateItemByIndex = (items, updatedItem, index) => {
+  if (index === -1) {
+    return items;
+  }
+
+  return [
+    ...items.slice(0, index),
+    updatedItem,
+    ...items.slice(index + 1),
+  ];
+};
+
+const updateItemById = (items, updatedItem) => {
+  const index = items.findIndex((item) => item.id === updatedItem.id);
+  return updateItemByIndex(items, updatedItem, index);
+};
+
+const updateItemByName = (items, updatedItem) => {
+  const index = items.findIndex((item) => item.name === updatedItem.name);
+  return updateItemByIndex(items, updatedItem, index);
+};
+
 export {
   isEscapeKey,
   getRandomDate,
@@ -29,4 +51,6 @@ export {
   formatDateDescription,
   formatMinutesToTime,
   defineGenresDescrition,
+  updateItemById,
+  updateItemByName,
 };
