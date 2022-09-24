@@ -43,6 +43,46 @@ const updateItemByName = (items, updatedItem) => {
   return updateItemByIndex(items, updatedItem, index);
 };
 
+const getWeightForNull = (valueA, valueB) => {
+  if (valueA === null && valueB === null) {
+    return 0;
+  }
+
+  if (valueA === null) {
+    return 1;
+  }
+
+  if (valueB === null) {
+    return -1;
+  }
+
+  return null;
+};
+
+const sortByDateUp = (movieA, movieB) => {
+  const weight = getWeightForNull(movieA.filmInfo.release.date, movieB.filmInfo.release.date);
+
+  return weight ?? dayjs(movieA.filmInfo.release.date).diff(dayjs(movieB.filmInfo.release.date));
+};
+
+const sortByDateDown = (movieA, movieB) => {
+  const weight = getWeightForNull(movieA.filmInfo.release.date, movieB.filmInfo.release.date);
+
+  return weight ?? dayjs(movieB.filmInfo.release.date).diff(dayjs(movieA.filmInfo.release.date));
+};
+
+const sortByValueUp = (movieA, movieB) => {
+  const weight = getWeightForNull(movieA.filmInfo.totalRating, movieB.filmInfo.totalRating);
+
+  return weight ?? dayjs(movieA.filmInfo.totalRating).diff(dayjs(movieB.filmInfo.totalRating));
+};
+
+const sortByValueDown = (movieA, movieB) => {
+  const weight = getWeightForNull(movieA.filmInfo.totalRating, movieB.filmInfo.totalRating);
+
+  return weight ?? dayjs(movieB.filmInfo.totalRating).diff(dayjs(movieA.filmInfo.totalRating));
+};
+
 export {
   isEscapeKey,
   getRandomDate,
@@ -53,4 +93,8 @@ export {
   defineGenresDescrition,
   updateItemById,
   updateItemByName,
+  sortByDateUp,
+  sortByDateDown,
+  sortByValueUp,
+  sortByValueDown,
 };

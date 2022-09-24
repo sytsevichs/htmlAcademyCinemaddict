@@ -38,6 +38,8 @@ export default class PopupPresenter {
 
   };
 
+  closeDetailsView = () => this.#closeDetailsView();
+
   updateControls = (controls) => {
     this.#renderControls(controls, this.#movieDetailsTopContainer.element);
   };
