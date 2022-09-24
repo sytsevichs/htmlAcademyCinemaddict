@@ -221,6 +221,28 @@ const CONTROLS = [
   },
 ];
 
+const SortType = {
+  DEFAULT : 'default',
+  DATE : 'date',
+  RATING : 'rating'
+};
+
+const SORTING = [
+  {
+    name: SortType.DEFAULT,
+    text: 'Sort by default',
+  },
+  {
+    name: SortType.DATE,
+    text: 'Sort by date',
+  },
+  {
+    name: SortType.RATING,
+    text: 'Sort by rating',
+  },
+];
+
+
 const ACTIVE_CONTROL = 'active';
 
 const MovieDescriptionLength = {
@@ -242,10 +264,10 @@ const FilterType = {
 };
 
 const FilterName = {
-  all: 'All movies',
-  watchlist: 'Watchlist',
-  history: 'History',
-  favorites: 'Favorites',
+  [FilterType.all]: 'All movies',
+  [FilterType.watchlist]: 'Watchlist',
+  [FilterType.history]: 'History',
+  [FilterType.favorites]: 'Favorites',
 };
 
 const comments = [
@@ -288,10 +310,12 @@ export {
   CONTROL_TYPES,
   CONTROLS,
   ACTIVE_CONTROL,
+  SORTING,
   MovieDescriptionLength,
   DateGenerationData,
   FilterType,
   FilterName,
+  SortType,
   comments,
   firstNames,
   secondNames,

@@ -1,6 +1,6 @@
 
 import { render,remove, replace } from '../framework/render.js';
-import { MOVIES_NUMBER_PER_STEP } from '../utils/const.js';
+import { MOVIES_NUMBER_PER_STEP, SortType } from '../utils/const.js';
 import { generateFilter } from '../mock/filter.js';
 import FilterNavigationView from '../view/filter-navigation-view.js';
 import SortView from '../view/sort-view.js';
@@ -11,23 +11,25 @@ import MoviesView from '../view/movies/movies-view.js';
 import ShowMoreButton from '../view/show-more-button-view.js';
 import MoviePresenter from './movie-presenter.js';
 import PopupPresenter from './popup-presenter.js';
-import { updateItemById } from '../utils/utils.js';
+import { updateItemById, sortByDateUp, sortByValueDown } from '../utils/utils.js';
 
 export default class BoardPresenter {
   #movies = new MoviesView();
   #moviesList = new MoviesListView();
   #moviesContainer = new MoviesContainerView();
   #showMoreButton = new ShowMoreButton();
-  #sortComponent = new SortView();
+  #sortComponent;
   #boardContainer;
   #moviesModel;
-  #boardMovies;
+  #boardMovies = [];
+  #sourceBoardMovies = [];
   #renderedMoviesCount = MOVIES_NUMBER_PER_STEP;
   #filters;
   #moviesPresenter = new Map();
   #popupPresenter;
   #popupMovieId = null;
   #filtersNavigation = null;
+  #currentSortType = null;
 
   constructor(container, moviesModel) {
     this.#boardContainer = container;
@@ -35,7 +37,8 @@ export default class BoardPresenter {
   }
 
   init = () => {
-    this.#boardMovies = [...this.#moviesModel.movies];
+    this.sourceBoardMovies = [...this.#moviesModel.movies];
+    this.#boardMovies = [...this.sourceBoardMovies];
     this.#renderBoard();
   };
 
@@ -64,7 +67,44 @@ export default class BoardPresenter {
   };
 
   #renderSorting = () => {
+    this.#sortComponent = new SortView(SortType.DEFAULT);
     render(this.#sortComponent, this.#boardContainer);
+    this.#sortComponent.setClickHandler(this.#handleSortingChange);
+  };
+
+  #changeSorting = (sortType) => {
+    const prevSortComponent = this.#sortComponent;
+    this.#sortComponent = new SortView(sortType);
+    render(this.#sortComponent, this.#boardContainer);
+
+    if (this.#boardContainer.contains(prevSortComponent.element)) {
+      replace(this.#sortComponent, prevSortComponent);
+    }
+
+    remove(prevSortComponent);
+    this.#sortComponent.setClickHandler(this.#handleSortingChange);
+  };
+
+  #handleSortingChange = (sortType) => {
+    this.#changeSorting(sortType);
+    this.#sortMovies(sortType);
+    this.#clearMoviesList();
+    this.#renderMoviesList();
+  };
+
+  #sortMovies = (sortType) => {
+    switch (sortType) {
+      case SortType.DATE:
+        this.#boardMovies.sort(sortByDateUp);
+        break;
+      case SortType.RATING:
+        this.#boardMovies.sort(sortByValueDown);
+        break;
+      default:
+        this.#boardMovies = [...this.sourceBoardMovies];
+    }
+
+    this.#currentSortType = sortType;
   };
 
   #renderMoviesList = () => {
@@ -118,15 +158,11 @@ export default class BoardPresenter {
     }
   };
 
-  #clearMoviesList = () => {
-    this.#moviesPresenter.forEach((presenter) => presenter.destroy());
-    this.#moviesPresenter.clear();
-    this.#renderedMoviesCount = MOVIES_NUMBER_PER_STEP;
-    remove(this.this.#showMoreButton);
-  };
-
   #showMovieDetails = (movie,comments) => {
     this.#popupMovieId = movie.id;
+    if (this.#popupPresenter) {
+      this.#popupPresenter.closeDetailsView();
+    }
     this.#popupPresenter = new PopupPresenter(movie, comments, this.#handleMovieControlChange);
     this.#popupPresenter.init();
   };
@@ -138,6 +174,13 @@ export default class BoardPresenter {
     }
     this.#boardMovies = updateItemById(this.#boardMovies, movie);
     this.#renderFilters();
+  };
+
+  #clearMoviesList = () => {
+    this.#moviesPresenter.forEach((presenter) => presenter.destroy());
+    this.#moviesPresenter.clear();
+    this.#renderedMoviesCount = MOVIES_NUMBER_PER_STEP;
+    remove(this.#showMoreButton);
   };
 
 }
