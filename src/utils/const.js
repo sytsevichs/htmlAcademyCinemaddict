@@ -196,6 +196,33 @@ const EMOTIONS = [
   },
 ];
 
+const CONTROL_TYPES = {
+  watchlist: 0,
+  watched: 1,
+  favorite: 2,
+};
+
+
+const CONTROLS = [
+  {
+    name: 'watchlist',
+    textUp: 'Add to watchlist',
+    textDown: 'In watchlist',
+  },
+  {
+    name: 'watched',
+    textUp: 'Mark as watched',
+    textDown: 'Already watched',
+  },
+  {
+    name: 'favorite',
+    textUp: 'Mark as favorite',
+    textDown: 'In favorites',
+  },
+];
+
+const ACTIVE_CONTROL = 'active';
+
 const MovieDescriptionLength = {
   min : 0,
   max : 139
@@ -208,6 +235,13 @@ const DateGenerationData = {
 };
 
 const FilterType = {
+  all: 'all',
+  watchlist: 'watchlist',
+  history: 'history',
+  favorites: 'favorites',
+};
+
+const FilterName = {
   all: 'All movies',
   watchlist: 'Watchlist',
   history: 'History',
@@ -251,9 +285,13 @@ export {
   MINUTES_IN_HOUR,
   MOVIES_INFO,
   EMOTIONS,
+  CONTROL_TYPES,
+  CONTROLS,
+  ACTIVE_CONTROL,
   MovieDescriptionLength,
   DateGenerationData,
   FilterType,
+  FilterName,
   comments,
   firstNames,
   secondNames,
