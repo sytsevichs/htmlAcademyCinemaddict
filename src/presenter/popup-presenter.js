@@ -13,6 +13,7 @@ export default class PopupPresenter {
   #movie;
   #comments;
   #updateMovieControls;
+  #updateMovieComments;
   #detailsElement;
   #bodyBuilder = new bodyView();
   #movieDetailsSection = new MovieDetailsSectionView();
@@ -22,10 +23,11 @@ export default class PopupPresenter {
   #movieDetailsTopInfo;
   #movieDetailsBottomContainer;
 
-  constructor(movie,comments,updateMovieControls) {
+  constructor(movie,comments,updateMovieControls, updateMovieComments) {
     this.#movie = movie;
     this.#comments = comments;
     this.#updateMovieControls = updateMovieControls;
+    this.#updateMovieComments = updateMovieComments;
   }
 
   init = () => {
@@ -87,7 +89,8 @@ export default class PopupPresenter {
   };
 
   #renderBottomContainer = (container) => {
-    this.#movieDetailsBottomContainer = new MovieDetailsBottomContainerView(this.#comments);
+    this.#movieDetailsBottomContainer = new MovieDetailsBottomContainerView(this.#movie.id, this.#comments);
+    this.#movieDetailsBottomContainer.setHandlers(this.#updateMovieComments);
     render(this.#movieDetailsBottomContainer, container);
   };
 
