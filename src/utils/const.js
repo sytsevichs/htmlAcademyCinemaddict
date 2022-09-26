@@ -10,7 +10,7 @@ const MOVIES_INFO = [
     alternativeTitle: 'Made for Each Other',
     totalRating: 6.3,
     poster: './images/posters/made-for-each-other.png',
-    ageRating: 18,
+    ageRating: '18+',
     director: 'John Cromwell',
     writers: [
       'Jo Swerling',
@@ -35,7 +35,7 @@ const MOVIES_INFO = [
     alternativeTitle: 'Папай-морячок встречается с Синдбадом-мореходом',
     totalRating: 7.3,
     poster: './images/posters/popeye-meets-sinbad.png',
-    ageRating: 6,
+    ageRating: '6+',
     director: 'Dave Fleischer',
     writers: [
       'Izzy Sparber',
@@ -60,7 +60,7 @@ const MOVIES_INFO = [
     alternativeTitle: 'След в полыни',
     totalRating: 5.4,
     poster: './images/posters/sagebrush-trail.jpg',
-    ageRating: 16,
+    ageRating: '16+',
     director: 'Armand Schaefer',
     writers: [
       'Lindsley Parsons(',
@@ -84,7 +84,7 @@ const MOVIES_INFO = [
     alternativeTitle: 'Santa Claus Defeats the Aliens',
     totalRating: 2.7,
     poster: './images/posters/santa-claus-conquers-the-martians.jpg',
-    ageRating: 0,
+    ageRating: '0+',
     director: 'Nicholas Webster',
     writers: [
       'Glenville Mareth',
@@ -108,7 +108,7 @@ const MOVIES_INFO = [
     alternativeTitle: 'Burlesque',
     totalRating: 6.8,
     poster: './images/posters/the-dance-of-life.jpg',
-    ageRating: 18,
+    ageRating: '18+',
     director: 'John Cromwell',
     writers: [
       'George Manker Watters',
@@ -132,7 +132,7 @@ const MOVIES_INFO = [
     alternativeTitle: 'Strange Affair',
     totalRatigng: 6.5,
     poster: './images/posters/the-great-flamarion.jpg',
-    ageRating: 18,
+    ageRating: '18+',
     director: 'Anthony Mann',
     writers: [
       'Anne Wigton',
@@ -156,7 +156,7 @@ const MOVIES_INFO = [
     alternativeTitle: 'Чeловек с золотой рукой',
     totalRating: 7.3,
     poster: '/images/posters/the-man-with-the-golden-arm.jpg',
-    ageRating: 18,
+    ageRating: '18+',
     director: 'Otto Preminger',
     writers: [
       'Walter Newman',

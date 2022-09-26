@@ -15,5 +15,4 @@ export default class MovieDetailsCloseButtomView extends AbstactView {
     evt.preventDefault();
     this._callback.click();
   };
-
 }

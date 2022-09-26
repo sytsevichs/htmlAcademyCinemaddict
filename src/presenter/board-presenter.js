@@ -11,7 +11,7 @@ import MoviesView from '../view/movies/movies-view.js';
 import ShowMoreButton from '../view/show-more-button-view.js';
 import MoviePresenter from './movie-presenter.js';
 import PopupPresenter from './popup-presenter.js';
-import { updateItemById, sortByDateUp, sortByValueDown } from '../utils/utils.js';
+import { updateItemById, sortByDateUp, sortByDateDown, sortByValueUp, sortByValueDown } from '../utils/utils.js';
 
 export default class BoardPresenter {
   #movies = new MoviesView();
@@ -30,6 +30,7 @@ export default class BoardPresenter {
   #popupMovieId = null;
   #filtersNavigation = null;
   #currentSortType = null;
+  #currentSortDirectuion = true;
 
   constructor(container, moviesModel) {
     this.#boardContainer = container;
@@ -61,9 +62,7 @@ export default class BoardPresenter {
     if (this.#boardContainer.contains(prevfiltersNavigation.element)) {
       replace(this.#filtersNavigation, prevfiltersNavigation);
     }
-
     remove(prevfiltersNavigation);
-
   };
 
   #renderSorting = () => {
@@ -92,18 +91,31 @@ export default class BoardPresenter {
     this.#renderMoviesList();
   };
 
+
   #sortMovies = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      this.#currentSortDirectuion = !this.#currentSortDirectuion;
+    } else {
+      this.#currentSortDirectuion = true;
+    }
     switch (sortType) {
       case SortType.DATE:
-        this.#boardMovies.sort(sortByDateUp);
+        if (this.#currentSortDirectuion) {
+          this.#boardMovies.sort(sortByDateUp);
+        } else {
+          this.#boardMovies.sort(sortByDateDown);
+        }
         break;
       case SortType.RATING:
-        this.#boardMovies.sort(sortByValueDown);
+        if (this.#currentSortDirectuion) {
+          this.#boardMovies.sort(sortByValueDown);
+        } else {
+          this.#boardMovies.sort(sortByValueUp);
+        }
         break;
       default:
         this.#boardMovies = [...this.sourceBoardMovies];
     }
-
     this.#currentSortType = sortType;
   };
 
@@ -163,17 +175,21 @@ export default class BoardPresenter {
     if (this.#popupPresenter) {
       this.#popupPresenter.closeDetailsView();
     }
-    this.#popupPresenter = new PopupPresenter(movie, comments, this.#handleMovieControlChange);
+    this.#popupPresenter = new PopupPresenter(movie, comments, this.#handleMovieControlChange, this.#handleMovieComments);
     this.#popupPresenter.init();
   };
 
   #handleMovieControlChange = (movie,controls) => {
-    this.#moviesPresenter.get(movie.id).updateControls(controls);
+    this.#moviesPresenter.get(movie.id).updateControls();
     if (this.#popupMovieId === movie.id) {
       this.#popupPresenter.updateControls(controls);
     }
     this.#boardMovies = updateItemById(this.#boardMovies, movie);
     this.#renderFilters();
+  };
+
+  #handleMovieComments = (movieId,comments) => {
+    this.#moviesPresenter.get(movieId).updateData(comments);
   };
 
   #clearMoviesList = () => {

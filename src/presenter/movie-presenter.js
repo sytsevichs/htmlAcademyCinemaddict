@@ -46,6 +46,11 @@ export default class MoviePresenter {
     this.#movieComments = [... this.#movieCommentsModel.comments];
   };
 
+  updateData = (comments) => {
+    this.#movieComments = comments;
+    this.#renderData(this.#movieCardContainer.element);
+  };
+
   #renderData = (container) => {
     const prevMovieCardView = this.#movieCardView;
     this.#movieCardView = new MovieCardView(this.#movie, this.#movieComments );
