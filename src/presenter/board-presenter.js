@@ -2,6 +2,7 @@
 import { render,remove, replace } from '../framework/render.js';
 import { MOVIES_NUMBER_PER_STEP, SortType } from '../utils/const.js';
 import { generateFilter } from '../mock/filter.js';
+import MoviesModel from './model/movies-model.js';
 import FilterNavigationView from '../view/filter-navigation-view.js';
 import SortView from '../view/sort-view.js';
 import MoviesContainerView from '../view/movies/movies-container-view.js';
@@ -11,7 +12,7 @@ import MoviesView from '../view/movies/movies-view.js';
 import ShowMoreButton from '../view/show-more-button-view.js';
 import MoviePresenter from './movie-presenter.js';
 import PopupPresenter from './popup-presenter.js';
-import { updateItemById, sortByDateUp, sortByDateDown, sortByValueUp, sortByValueDown } from '../utils/utils.js';
+import { updateItemById, sortByDateUp, sortByDateDown, sortByRatingUp, sortByRatingDown } from '../utils/utils.js';
 
 export default class BoardPresenter {
   #movies = new MoviesView();
@@ -32,12 +33,12 @@ export default class BoardPresenter {
   #currentSortType = null;
   #currentSortDirectuion = true;
 
-  constructor(container, moviesModel) {
+  constructor(container) {
     this.#boardContainer = container;
-    this.#moviesModel = moviesModel;
   }
 
   init = () => {
+    this.#moviesModel = new MoviesModel();
     this.sourceBoardMovies = [...this.#moviesModel.movies];
     this.#boardMovies = [...this.sourceBoardMovies];
     this.#renderBoard();
@@ -108,9 +109,9 @@ export default class BoardPresenter {
         break;
       case SortType.RATING:
         if (this.#currentSortDirectuion) {
-          this.#boardMovies.sort(sortByValueDown);
+          this.#boardMovies.sort(sortByRatingDown);
         } else {
-          this.#boardMovies.sort(sortByValueUp);
+          this.#boardMovies.sort(sortByRatingUp);
         }
         break;
       default:
@@ -185,6 +186,7 @@ export default class BoardPresenter {
       this.#popupPresenter.updateControls(controls);
     }
     this.#boardMovies = updateItemById(this.#boardMovies, movie);
+
     this.#renderFilters();
   };
 

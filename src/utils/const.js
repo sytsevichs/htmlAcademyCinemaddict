@@ -130,7 +130,7 @@ const MOVIES_INFO = [
     id: 6,
     title: 'The Great Flamarion',
     alternativeTitle: 'Strange Affair',
-    totalRatigng: 6.5,
+    totalRating: 6.5,
     poster: './images/posters/the-great-flamarion.jpg',
     ageRating: '18+',
     director: 'Anthony Mann',
