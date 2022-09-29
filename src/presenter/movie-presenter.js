@@ -24,7 +24,7 @@ export default class MoviePresenter {
 
   init = () => {
 
-    this.#generateComments(this.#movie.id);
+    this.#getComments(this.#movie.id);
 
     this.#renderData(this.#movieCardContainer.element);
     this.#renderControls(this.#movieCardContainer.element);
@@ -41,13 +41,14 @@ export default class MoviePresenter {
     this.#renderControls(this.#movieCardContainer.element);
   };
 
-  #generateComments = (id) => {
+  #getComments = (id) => {
     this.#movieCommentsModel = new CommentsModel(id);
-    this.#movieComments = [... this.#movieCommentsModel.comments];
+    this.#movieComments = [...this.#movieCommentsModel.comments];
   };
 
   updateData = (comments) => {
     this.#movieComments = comments;
+    this.#movieCommentsModel.comments = this.#movieComments;
     this.#renderData(this.#movieCardContainer.element);
   };
 

@@ -128,6 +128,7 @@ export default class MovieDetailsBottomContainerView extends AbstractStatefulVie
 
   #deleteCommentHandler = (evt) => {
     evt.preventDefault();
+    //delete
     this._state.comments.splice(this._state.comments.findIndex((comment) => comment.id === evt.target.dataset.id));
     this._callback.updateComments(this._state.movieId,MovieDetailsBottomContainerView.parseStateToComments(this._state));
     this.updateElement(this._state);
@@ -153,6 +154,7 @@ export default class MovieDetailsBottomContainerView extends AbstractStatefulVie
         date: new Date(),
         emoji: this._state.emotion,
       };
+      //addcomment
       this._state.comments.push(newComment);
       this._state.comment = '';
       this._state.emotion = '';
