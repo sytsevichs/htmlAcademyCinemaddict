@@ -259,8 +259,8 @@ const DateGenerationData = {
 const FilterType = {
   all: 'all',
   watchlist: 'watchlist',
-  history: 'history',
-  favorites: 'favorites',
+  history: 'watched',
+  favorites: 'favorite',
 };
 
 const FilterName = {
@@ -268,6 +268,30 @@ const FilterName = {
   [FilterType.watchlist]: 'Watchlist',
   [FilterType.history]: 'History',
   [FilterType.favorites]: 'Favorites',
+};
+const FilterMessage = {
+  [FilterType.all]: 'There are no movies in our database',
+  [FilterType.watchlist]: 'There are no movies to watch now',
+  [FilterType.history]: 'There are no watched movies now',
+  [FilterType.favorites]: 'There are no favorite movies now',
+};
+
+const UserAction = {
+  UPDATE: 'UPDATE',
+  ADD: 'ADD',
+  DELETE: 'DELETE',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+
+const MoviesUpdateGroup = {
+  ALL: 'ALL',
+  SINGLE: 'SINGLE',
 };
 
 const comments = [
@@ -300,6 +324,7 @@ const secondNames = [
   'Semenov',
 ];
 
+
 export {
   MOVIES_NUMBER_DEFAULT,
   MOVIES_NUMBER_PER_STEP,
@@ -315,7 +340,11 @@ export {
   DateGenerationData,
   FilterType,
   FilterName,
+  FilterMessage,
   SortType,
+  UserAction,
+  UpdateType,
+  MoviesUpdateGroup,
   comments,
   firstNames,
   secondNames,

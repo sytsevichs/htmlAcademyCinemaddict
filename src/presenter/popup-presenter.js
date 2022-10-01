@@ -8,12 +8,13 @@ import MovieDetailsTopControlsView from '../view/popup/movie-details-top-control
 import MovieDetailsInnerView from '../view/popup/movie-details-inner-view.js';
 import bodyView from '../view/body/body-view.js';
 import { isEscapeKey, updateItemByName } from '../utils/utils.js';
+import { UpdateType, UserAction } from '../utils/const.js';
 
 export default class PopupPresenter {
   #movie;
   #comments;
-  #updateMovieControls;
-  #updateMovieComments;
+  #handleMovieControlChange;
+  #handleCommentsViewEvent;
   #detailsElement;
   #bodyBuilder = new bodyView();
   #movieDetailsSection = new MovieDetailsSectionView();
@@ -23,11 +24,11 @@ export default class PopupPresenter {
   #movieDetailsTopInfo;
   #movieDetailsBottomContainer;
 
-  constructor(movie,comments,updateMovieControls, updateMovieComments) {
+  constructor(movie,comments,handleMovieControlChange, handleCommentsViewEvent) {
     this.#movie = movie;
     this.#comments = comments;
-    this.#updateMovieControls = updateMovieControls;
-    this.#updateMovieComments = updateMovieComments;
+    this.#handleMovieControlChange = handleMovieControlChange;
+    this.#handleCommentsViewEvent = handleCommentsViewEvent;
   }
 
   init = () => {
@@ -90,7 +91,7 @@ export default class PopupPresenter {
 
   #renderBottomContainer = (container) => {
     this.#movieDetailsBottomContainer = new MovieDetailsBottomContainerView(this.#movie.id, this.#comments);
-    this.#movieDetailsBottomContainer.setHandlers(this.#updateMovieComments);
+    this.#movieDetailsBottomContainer.setHandlers(this.#handleCommentsViewEvent);
     render(this.#movieDetailsBottomContainer, container);
   };
 
@@ -104,7 +105,7 @@ export default class PopupPresenter {
   #changeMovieControl = (control) => {
     control.active = !control.active;
     this.#movie.controls = updateItemByName(this.#movie.controls, control);
-    this.#updateMovieControls(this.#movie, this.#movie.controls);
+    this.#handleMovieControlChange(UserAction.UPDATE, UpdateType.PATCH, this.#movie);
   };
 
   #setEscapeListener = () => {
@@ -115,4 +116,6 @@ export default class PopupPresenter {
       }
     });
   };
+
+
 }

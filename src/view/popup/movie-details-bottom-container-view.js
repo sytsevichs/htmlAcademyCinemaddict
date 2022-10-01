@@ -2,7 +2,7 @@ import { nanoid } from 'nanoid';
 import adapter from 'webrtc-adapter';
 import AbstractStatefulView from '../../framework/view/abstract-stateful-view.js';
 import {
-  EMOTIONS
+  EMOTIONS, UpdateType, UserAction
 } from '../../utils/const.js';
 
 const isEnterKey = (evt) => evt.key === 'Enter';
@@ -95,7 +95,7 @@ export default class MovieDetailsBottomContainerView extends AbstractStatefulVie
   static parseStateToComments = (state) => state.comments;
 
   setHandlers = (callback) => {
-    this._callback.updateComments = callback;
+    this._callback.updateMovieComments = callback;
     this.#setEmotionClickHandler();
     this.#setOnValueInput();
     this.#setDeleteHandler();
@@ -128,9 +128,16 @@ export default class MovieDetailsBottomContainerView extends AbstractStatefulVie
 
   #deleteCommentHandler = (evt) => {
     evt.preventDefault();
-    //delete
-    this._state.comments.splice(this._state.comments.findIndex((comment) => comment.id === evt.target.dataset.id));
-    this._callback.updateComments(this._state.movieId,MovieDetailsBottomContainerView.parseStateToComments(this._state));
+    //Обновляем состояние и модель
+    this._callback.updateMovieComments(UserAction.DELETE, UpdateType.PATCH, this._state.movieId, this._state.comments[this._state.comments.findIndex((comment) => comment.id === evt.target.dataset.id)]);
+
+    const index = this._state.comments.findIndex((comment) => comment.id === evt.target.dataset.id);
+
+    this._state.comments = [
+      ...this._state.comments.slice(0, index),
+      ...this._state.comments.slice(index + 1),
+    ];
+
     this.updateElement(this._state);
   };
 
@@ -143,6 +150,7 @@ export default class MovieDetailsBottomContainerView extends AbstractStatefulVie
     });
   };
 
+  //Обработка добавления нового комментария из состояния представления
   #submitNewComment = () => {
     if (this._state.comment && this._state.emotion) {
       const id = nanoid();
@@ -154,17 +162,18 @@ export default class MovieDetailsBottomContainerView extends AbstractStatefulVie
         date: new Date(),
         emoji: this._state.emotion,
       };
-      //addcomment
+      //Передаем новый комментарий в модель
+      this._callback.updateMovieComments(UserAction.ADD, UpdateType.PATCH, this._state.movieId, newComment);
+      //добавляем объект в состояние
       this._state.comments.push(newComment);
       this._state.comment = '';
       this._state.emotion = '';
-      this._callback.updateComments(this._state.movieId,MovieDetailsBottomContainerView.parseStateToComments(this._state));
       this.updateElement(this._state);
     }
   };
 
   _restoreHandlers = () => {
-    this.setHandlers(this._callback.updateComments);
+    this.setHandlers(this._callback.updateMovieComments);
   };
 
   get template() {

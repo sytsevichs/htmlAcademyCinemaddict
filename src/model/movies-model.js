@@ -1,9 +1,9 @@
-import { MOVIES_NUMBER_DEFAULT } from '../utils/const.js';
+import { MoviesUpdateGroup, MOVIES_NUMBER_DEFAULT, UpdateType, UserAction } from '../utils/const.js';
 import { generateMovie } from '../mock/movie.js';
-import Observable from '../framework/observable.js';
+import Observer from '../framework/observable.js';
 import { updateItemById } from '../utils/utils.js';
 
-export default class MoviesModel extends Observable {
+export default class MoviesModel extends Observer {
   #movies = null;
 
   get movies() {
@@ -15,10 +15,14 @@ export default class MoviesModel extends Observable {
 
   set movies(movies) {
     this.#movies = movies;
+    //Вызываем все обработчики, зарегистированные для обновления всех фильмов
+    this._notify(UpdateType.MINOR, UserAction.UPDATE, this.#movies, MoviesUpdateGroup.ALL);
   }
 
-  updateSingleMovie = (movie) => {
+  updateSingleMovie = (updateType, movie) => {
     this.#movies = updateItemById(this.#movies, movie);
+    //Вызываем все обработчики, зарегистированные для обновления одного фильма
+    this._notify(updateType, movie.id, movie, MoviesUpdateGroup.SINGLE);
   };
 
 }
