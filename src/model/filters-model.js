@@ -12,16 +12,28 @@ export default class FilterModel extends Observer {
     this.#movies = movies;
   }
 
+  init = (movies) => {
+    this.#movies = movies;
+  };
+
   get filters() {
+    let filters = [];
     if (!this.#filters) {
-      this.#filters = Object.entries(filterData).map(
+      filters = Object.entries(filterData).map(
         ([filterType, filterMovies]) => ({
           name: filterType,
           text: FilterName[filterType],
           active: filterType === FilterType.all,
           count: filterMovies(this.#movies).length,
         }));
+    } else {
+      filters = Object.values(this.#filters).map(
+        (filter) => ({...filter,
+          count: filterData[filter.name](this.#movies).length,
+        })
+      );
     }
+    this.#filters = filters;
     return this.#filters;
   }
 

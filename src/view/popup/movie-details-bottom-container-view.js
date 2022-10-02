@@ -10,10 +10,10 @@ const isEnterKey = (evt) => evt.key === 'Enter';
 const createMovieCommentItemTemplate = (comment) => (
   `<li class="film-details__comment">
     <span class="film-details__comment-emoji">
-      <img src="./images/emoji/${comment.emoji}.png" width="55" height="55" alt="emoji-${comment.emoji}">
+      <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-${comment.emotion}">
     </span>
     <div>
-      <p class="film-details__comment-text">${comment.text}</p>
+      <p class="film-details__comment-text">${comment.comment}</p>
       <p class="film-details__comment-info">
         <span class="film-details__comment-author">${comment.author}</span>
         <span class="film-details__comment-day">${comment.date}</span>
@@ -156,11 +156,10 @@ export default class MovieDetailsBottomContainerView extends AbstractStatefulVie
       const id = nanoid();
       const newComment = {
         id: id,
-        movieId: this._state.movieId,
         author: this._state.author,
-        text: this._state.comment,
+        comment: this._state.comment,
+        emotion: this._state.emotion,
         date: new Date(),
-        emoji: this._state.emotion,
       };
       //Передаем новый комментарий в модель
       this._callback.updateMovieComments(UserAction.ADD, UpdateType.PATCH, this._state.movieId, newComment);

@@ -2,7 +2,7 @@ import AbstactView from '../framework/view/abstract-view.js';
 
 const createFilterItemTemplate = (filter, isChecked) => {
   const {name, text, count} = filter;
-  return (`<a href="#${name}"  class="main-navigation__item ${isChecked ? 'main-navigation__item--active"' : '"'} " data-name="${name}">${text} <span class="main-navigation__item-count">${count}</span></a>` );
+  return (`<a href="#${name}"  class="main-navigation__item ${isChecked ? 'main-navigation__item--active"' : '"'} data-name="${name}">${text} <span class="main-navigation__item-count">${count}</span></a>` );
 };
 
 const createFilterNavigationTemplate = (filterItems) => {
