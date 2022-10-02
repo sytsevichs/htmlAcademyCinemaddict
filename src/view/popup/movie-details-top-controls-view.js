@@ -33,6 +33,7 @@ export default class MovieDetailsTopControlsView extends AbstactView {
   #handleButtonClick = (evt) => {
     evt.preventDefault();
     this._callback.button(this.#controls[CONTROL_TYPES[evt.target.dataset.name]]);
+
   };
 
 }

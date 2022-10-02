@@ -9,7 +9,7 @@ export default class bodyView {
   }
 
   get header() {
-    return this.#element.querySelector('.header__logo');
+    return this.#element.querySelector('.header');
   }
 
   get main() {

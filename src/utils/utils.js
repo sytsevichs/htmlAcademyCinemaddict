@@ -71,16 +71,16 @@ const sortByDateDown = (movieA, movieB) => {
   return weight ?? dayjs(movieB.filmInfo.release.date).diff(dayjs(movieA.filmInfo.release.date));
 };
 
-const sortByValueUp = (movieA, movieB) => {
+const sortByRatingUp = (movieA, movieB) => {
   const weight = getWeightForNull(movieA.filmInfo.totalRating, movieB.filmInfo.totalRating);
 
-  return weight ?? dayjs(movieA.filmInfo.totalRating).diff(dayjs(movieB.filmInfo.totalRating));
+  return weight ?? movieA.filmInfo.totalRating - movieB.filmInfo.totalRating;
 };
 
-const sortByValueDown = (movieA, movieB) => {
+const sortByRatingDown = (movieA, movieB) => {
   const weight = getWeightForNull(movieA.filmInfo.totalRating, movieB.filmInfo.totalRating);
 
-  return weight ?? dayjs(movieB.filmInfo.totalRating).diff(dayjs(movieA.filmInfo.totalRating));
+  return weight ?? movieB.filmInfo.totalRating - movieA.filmInfo.totalRating;
 };
 
 export {
@@ -95,6 +95,6 @@ export {
   updateItemByName,
   sortByDateUp,
   sortByDateDown,
-  sortByValueUp,
-  sortByValueDown,
+  sortByRatingUp,
+  sortByRatingDown,
 };

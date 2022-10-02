@@ -1,7 +1,6 @@
 
 import { render,remove, replace } from '../framework/render.js';
-import { MOVIES_NUMBER_PER_STEP, SortType } from '../utils/const.js';
-import { generateFilter } from '../mock/filter.js';
+import { FilterMessage, FilterType, MoviesUpdateGroup, MOVIES_NUMBER_PER_STEP, SortType, UpdateType, UserAction } from '../utils/const.js';
 import FilterNavigationView from '../view/filter-navigation-view.js';
 import SortView from '../view/sort-view.js';
 import MoviesContainerView from '../view/movies/movies-container-view.js';
@@ -11,7 +10,8 @@ import MoviesView from '../view/movies/movies-view.js';
 import ShowMoreButton from '../view/show-more-button-view.js';
 import MoviePresenter from './movie-presenter.js';
 import PopupPresenter from './popup-presenter.js';
-import { updateItemById, sortByDateUp, sortByDateDown, sortByValueUp, sortByValueDown } from '../utils/utils.js';
+import { sortByDateUp, sortByDateDown, sortByRatingUp, sortByRatingDown } from '../utils/utils.js';
+import FilterModel from '../model/filters-model.js';
 
 export default class BoardPresenter {
   #movies = new MoviesView();
@@ -21,16 +21,20 @@ export default class BoardPresenter {
   #sortComponent;
   #boardContainer;
   #moviesModel;
-  #boardMovies = [];
-  #sourceBoardMovies = [];
+  #boardMovies;
+  #moviesLength;
   #renderedMoviesCount = MOVIES_NUMBER_PER_STEP;
   #filters;
+  #filtersModel;
   #moviesPresenter = new Map();
   #popupPresenter;
   #popupMovieId = null;
   #filtersNavigation = null;
+  #listMesssage = null;
+  #currentFilter = null;
   #currentSortType = null;
-  #currentSortDirectuion = true;
+  #newSortType = null;
+  #currentSortDirection = true;
 
   constructor(container, moviesModel) {
     this.#boardContainer = container;
@@ -38,42 +42,55 @@ export default class BoardPresenter {
   }
 
   init = () => {
-    this.sourceBoardMovies = [...this.#moviesModel.movies];
-    this.#boardMovies = [...this.sourceBoardMovies];
     this.#renderBoard();
   };
 
   #renderBoard = () => {
+    this.#filtersModel = new FilterModel(this.#moviesModel.movies);
+    this.#filtersModel.addObserver(this.#handleFilterModelUpdate);
+    this.#filters = this.#filtersModel.filters;
     this.#renderFilters();
     this.#renderSorting();
     this.#renderMoviesList();
   };
 
   #renderFilters = () => {
-    this.#filters = generateFilter(this.#boardMovies);
-    const prevfiltersNavigation = this.#filtersNavigation;
+    const prevFiltersNavigation = this.#filtersNavigation;
     this.#filtersNavigation = new FilterNavigationView(this.#filters);
+    this.#filtersNavigation.setClickHandler(this.#handleFilterClick);
 
-    if ( prevfiltersNavigation === null || this.#filtersNavigation === null ) {
+    if ( prevFiltersNavigation === null || this.#filtersNavigation === null ) {
       render(this.#filtersNavigation, this.#boardContainer);
       return;
     }
 
-    if (this.#boardContainer.contains(prevfiltersNavigation.element)) {
-      replace(this.#filtersNavigation, prevfiltersNavigation);
+    if (this.#boardContainer.contains(prevFiltersNavigation.element)) {
+      replace(this.#filtersNavigation, prevFiltersNavigation);
     }
-    remove(prevfiltersNavigation);
+    remove(prevFiltersNavigation);
+  };
+
+  #handleFilterModelUpdate = (updateType, newFilter, newFilters) => {
+    this.#currentFilter = newFilter;
+    this.#filters = newFilters;
+    this.#renderFilters();
+    this.#updateMoviesList();
+  };
+
+  #handleFilterClick = (newFilter) => {
+    this.#filtersModel.updateSingleFilter(newFilter);
   };
 
   #renderSorting = () => {
-    this.#sortComponent = new SortView(SortType.DEFAULT);
+    this.#currentSortType = SortType.DEFAULT;
+    this.#sortComponent = new SortView(this.#currentSortType);
     render(this.#sortComponent, this.#boardContainer);
     this.#sortComponent.setClickHandler(this.#handleSortingChange);
   };
 
-  #changeSorting = (sortType) => {
+  #changeSorting = () => {
     const prevSortComponent = this.#sortComponent;
-    this.#sortComponent = new SortView(sortType);
+    this.#sortComponent = new SortView(this.#newSortType);
     render(this.#sortComponent, this.#boardContainer);
 
     if (this.#boardContainer.contains(prevSortComponent.element)) {
@@ -85,42 +102,55 @@ export default class BoardPresenter {
   };
 
   #handleSortingChange = (sortType) => {
-    this.#changeSorting(sortType);
-    this.#sortMovies(sortType);
+    if (this.#newSortType !== sortType ) {
+      this.#newSortType = sortType;
+      this.#changeSorting();
+    }
+    this.#updateMoviesList();
+  };
+
+  #updateMoviesList = () => {
     this.#clearMoviesList();
     this.#renderMoviesList();
   };
 
-
-  #sortMovies = (sortType) => {
-    if (this.#currentSortType === sortType) {
-      this.#currentSortDirectuion = !this.#currentSortDirectuion;
+  get movies() {
+    if (this.#currentSortType === this.#newSortType) {
+      this.#currentSortDirection = !this.#currentSortDirection;
     } else {
-      this.#currentSortDirectuion = true;
+      this.#currentSortDirection = true;
     }
-    switch (sortType) {
+    this.#currentSortType = this.#newSortType;
+
+    switch (this.#newSortType) {
       case SortType.DATE:
-        if (this.#currentSortDirectuion) {
-          this.#boardMovies.sort(sortByDateUp);
+        if (this.#currentSortDirection) {
+          return [...this.#moviesModel.movies].sort(sortByDateUp);
         } else {
-          this.#boardMovies.sort(sortByDateDown);
+          return [...this.#moviesModel.movies].sort(sortByDateDown);
         }
-        break;
       case SortType.RATING:
-        if (this.#currentSortDirectuion) {
-          this.#boardMovies.sort(sortByValueDown);
+        if (this.#currentSortDirection) {
+          return [...this.#moviesModel.movies].sort(sortByRatingDown);
         } else {
-          this.#boardMovies.sort(sortByValueUp);
+          return [...this.#moviesModel.movies].sort(sortByRatingUp);
         }
-        break;
       default:
-        this.#boardMovies = [...this.sourceBoardMovies];
+        return [...this.#moviesModel.movies];
     }
-    this.#currentSortType = sortType;
-  };
+  }
 
   #renderMoviesList = () => {
     this.#renderMoviesContainer();
+    //Запоминаем и выводим сортированный список
+    if (!this.#currentFilter || this.#currentFilter === FilterType.all ) {
+      this.#currentFilter = FilterType.all;
+      this.#boardMovies = this.movies;
+    } else {
+      this.#boardMovies = this.movies
+        .filter((movie) => this.#filters
+          .filter((filter) => filter.active).every((filter) => movie.controls.filter((control) => control.active).some((control) =>control.name === filter.name) ));
+    }
     this.#renderMoviesListMessage();
     this.#renderMovies(this.#boardMovies);
   };
@@ -128,16 +158,30 @@ export default class BoardPresenter {
   #renderMoviesContainer = () => {
     render(this.#movies,this.#boardContainer);
     render(this.#moviesList,this.#movies.element);
+    this.#moviesModel.addObserver(this.#handleMovieControlModelEvent, MoviesUpdateGroup.SINGLE);
   };
 
   #renderMoviesListMessage = () => {
-    render(new MoviesListMesssageView(this.#boardMovies.length), this.#moviesList.element);
+    const prevListMesssage = this.#listMesssage;
+    this.#moviesLength = this.#boardMovies.length;
+    this.#listMesssage = new MoviesListMesssageView(this.#moviesLength, FilterMessage[this.#currentFilter]);
+
+    if ( prevListMesssage === null || this.#listMesssage === null ) {
+      render(this.#listMesssage, this.#moviesList.element);
+      return;
+    }
+
+    if (this.#moviesList.element.contains(prevListMesssage.element)) {
+      replace(this.#listMesssage, prevListMesssage);
+    }
+    remove(prevListMesssage);
+
   };
 
   #renderMovies = (movies) => {
     render(this.#moviesContainer,this.#moviesList.element);
 
-    Array.from({length: Math.min(movies.length,MOVIES_NUMBER_PER_STEP)}, (a ,index) => {
+    Array.from({length: Math.min(this.#moviesLength,MOVIES_NUMBER_PER_STEP)}, (a ,index) => {
       this.#renderMovie(movies[index]);
     });
 
@@ -145,13 +189,13 @@ export default class BoardPresenter {
   };
 
   #renderMovie = (movie) => {
-    const moviePresenter = new MoviePresenter(movie, this.#moviesContainer.element, this.#showMovieDetails, this.#handleMovieControlChange);
+    const moviePresenter = new MoviePresenter(movie, this.#moviesContainer.element, this.#showMovieDetails, this.#handleMovieControlViewEvent,this.#handleCommentsModelEvent);
     moviePresenter.init();
     this.#moviesPresenter.set(movie.id, moviePresenter);
   };
 
   #renderShowMoreButton = () => {
-    if (this.#boardMovies.length > MOVIES_NUMBER_PER_STEP) {
+    if (this.#moviesLength > MOVIES_NUMBER_PER_STEP) {
       render(this.#showMoreButton,this.#moviesList.element);
       this.#showMoreButton.setClickHandler(this.#handleShowMoreButtonClick);
     }
@@ -164,7 +208,7 @@ export default class BoardPresenter {
 
     this.#renderedMoviesCount += MOVIES_NUMBER_PER_STEP;
 
-    if (this.#renderedMoviesCount >= this.#boardMovies.length) {
+    if (this.#renderedMoviesCount >= this.#moviesLength) {
       this.#showMoreButton.element.remove();
       this.#showMoreButton.removeElement();
     }
@@ -175,21 +219,55 @@ export default class BoardPresenter {
     if (this.#popupPresenter) {
       this.#popupPresenter.closeDetailsView();
     }
-    this.#popupPresenter = new PopupPresenter(movie, comments, this.#handleMovieControlChange, this.#handleMovieComments);
+    this.#popupPresenter = new PopupPresenter(movie, comments, this.#handleMovieControlViewEvent, this.#handleCommentsViewEvent);
     this.#popupPresenter.init();
   };
 
-  #handleMovieControlChange = (movie,controls) => {
-    this.#moviesPresenter.get(movie.id).updateControls();
-    if (this.#popupMovieId === movie.id) {
-      this.#popupPresenter.updateControls(controls);
+  // обработчик событий изменения модели элементов управления в представлениях
+  #handleMovieControlModelEvent = (updateType, id, movie) => {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this.#moviesPresenter.get(id).updateControls();
+        if (this.#popupMovieId === id) {
+          this.#popupPresenter.updateControls(movie.controls);
+        }
+        this.#renderFilters();
+        break;
+
+      default:
+        break;
     }
-    this.#boardMovies = updateItemById(this.#boardMovies, movie);
-    this.#renderFilters();
   };
 
-  #handleMovieComments = (movieId,comments) => {
-    this.#moviesPresenter.get(movieId).updateData(comments);
+  // обработчик событий изменения модели элементов управления одного фильма
+  #handleMovieControlViewEvent = (actionType, updateType, movie) => {
+    switch (actionType) {
+      case UserAction.UPDATE:
+        this.#moviesModel.updateSingleMovie(updateType,movie);
+        break;
+      default:
+        break;
+    }
+
+  };
+
+  // обработчик событий изменения модели комментариев
+  #handleCommentsViewEvent = (actionType, updateType, movieId, comment) => {
+    // Обновление модели комментариев
+    this.#moviesPresenter.get(movieId).updateCommentsModel(actionType, updateType, comment);
+  };
+
+  // обработчик событий изменения модели комментариев
+  #handleCommentsModelEvent = (updateType, movieId, comments) => {
+    // Обновление модели комментариев
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this.#moviesPresenter.get(movieId).updateData(comments);
+        break;
+
+      default:
+        break;
+    }
   };
 
   #clearMoviesList = () => {

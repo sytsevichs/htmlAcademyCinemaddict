@@ -9,8 +9,8 @@ export default class BodyPresenter {
   #bodyBuilder = new bodyView();
 
   init = () => {
-    render (this.#userRank, this.#bodyBuilder.element);
-    render (this.#footerStatisticsView, this.#bodyBuilder.element);
+    render (this.#userRank, this.#bodyBuilder.header);
+    render (this.#footerStatisticsView, this.#bodyBuilder.footer);
   };
 
   get container() {

@@ -1,6 +1,7 @@
 import AbstactView from '../../framework/view/abstract-view.js';
 import { formatDateToYear, formatMinutesToTime, defineGenresDescrition } from '../../utils/utils.js';
 import {MovieDescriptionLength } from '../../utils/const.js';
+import he from 'he';
 
 const createMovieCardTemplate = (movie, comments) => {
   const {filmInfo} = movie;
@@ -19,7 +20,7 @@ const createMovieCardTemplate = (movie, comments) => {
              </p>
              <img src=${filmInfo.poster} alt="" class="film-card__poster">
              <p class="film-card__description">${description}</p>
-             <span class="film-card__comments">${comments.length > 0 ? `${comments.length} ${commentsText}` : 'No comments'}</span>
+             <span class="film-card__comments">${comments.length > 0 ? `${comments.length} ${he.encode(commentsText)}` : 'No comments'}</span>
            </a>`);
 };
 export default class MovieCardView extends AbstactView {
