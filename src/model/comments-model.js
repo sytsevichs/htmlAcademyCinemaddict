@@ -1,22 +1,20 @@
-import { COMMENTS_NUMBER_DEFAULT } from '../utils/const.js';
-import { generateComment } from '../mock/comment.js';
-import { getRandomInteger } from '../utils/utils.js';
+import { UpdateType } from '../utils/const.js';
 import Observer from '../framework/observable.js';
 export default class CommentsModel extends Observer {
 
   #movieId;
   #comments = null;
+  #commentsService;
 
-  constructor(movieId) {
+  constructor(movieId, commentsService) {
     super();
     this.#movieId = movieId;
+    this.#commentsService = commentsService;
   }
-
-  #generateComments = () => Array.from({length: getRandomInteger(0,COMMENTS_NUMBER_DEFAULT)}, () => generateComment(this.#movieId));
 
   get comments() {
     if (!this.#comments) {
-      this.#comments = this.#generateComments();
+      this.#comments = [];
     }
     return this.#comments;
   }
@@ -24,6 +22,16 @@ export default class CommentsModel extends Observer {
   set comments(comments) {
     this.#comments = comments;
   }
+
+  init = async () => {
+    try {
+      this.#comments = await this.#commentsService.comments;
+    } catch (error) {
+      this.#comments = [];
+    }
+    this._notify(UpdateType.INIT, this.#movieId, this.#comments);
+  };
+
 
   addComment = (updateType, update) => {
     this.#comments = [

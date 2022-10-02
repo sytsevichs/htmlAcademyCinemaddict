@@ -1,5 +1,5 @@
 import AbstactView from '../framework/view/abstract-view.js';
-import { generateSorting } from '../mock/sorting.js';
+import { generateSorting } from '../utils/sorting.js';
 
 const createSortInemTemplate = (sorting,isChecked) => {
   const {name, text} = sorting;

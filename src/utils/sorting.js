@@ -1,4 +1,4 @@
-import { SORTING } from '../utils/const.js';
+import { SORTING } from './const.js';
 
 export const generateSorting = () => Object.values(SORTING).map(
   (sorting) =>({

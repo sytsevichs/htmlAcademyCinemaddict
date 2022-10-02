@@ -3,12 +3,12 @@
  * Доработан необязательным параметром "группа наблюдателей" для возможности подписки на обновления разных видоа данных одного объекта
  */
 export default class Observable {
-  /** @type {Set<сallback, group>} Множество функций типа subscrtionCallback */
+  /** @type {Set<сallback, group>} Множество функций типа observerCallback */
   #observers = new Set();
 
   /**
    * Метод, позволяющий подписаться на событие
-   * @param {subscrtionCallback} observer Функция, которая будет вызвана при наступлении события
+   * @param {observerCallback} observer Функция, которая будет вызвана при наступлении события
    */
   addObserver(callback, group = null) {
     this.#observers.add({callback, group});
@@ -16,7 +16,7 @@ export default class Observable {
 
   /**
    * Метод, позволяющий отписаться от события
-   * @param {subscrtionCallback} observer Функция, которую больше не нужно вызывать при наступлении события
+   * @param {observerCallback} observer Функция, которую больше не нужно вызывать при наступлении события
    */
   removeObserver(callback, group = null) {
     this.#observers.delete({callback, group});
@@ -41,7 +41,7 @@ export default class Observable {
 
 /**
  * Функция, которая будет вызвана при наступлении события
- * @callback subscrtionCallback
+ * @callback observerCallback
  * @param {*} event     Тип события
  * @param {*} id        Идентификатор обновления
  * @param {*} [payload] Дополнительная информация

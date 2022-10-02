@@ -1,6 +1,5 @@
 import { remove, render, replace } from '../framework/render.js';
 import MovieCardView from '../view/movies/movie-card-view.js';
-import CommentsModel from '../model/comments-model.js';
 import MovieCardContainerView from '../view/movies/movie-card-container-view.js';
 import MovieCardControlsView from '../view/movies/movie-card-controls-view.js';
 import { updateItemByName } from '../utils/utils.js';
@@ -10,98 +9,79 @@ export default class MoviePresenter {
   #container;
   #showMovieDetails;
   #handleMovieControlChange;
-  #updateMovieComments;
-  #movieCardContainer = new MovieCardContainerView();
-  #movieCommentsModel;
-  #movieComments;
-  #movieCardView = null;
-  #movieCardControlsView = null;
+  #movieCardContainerComponent = new MovieCardContainerView();
+  #movieCardComponent = null;
+  #movieCardControlsComponent = null;
 
-  constructor(movie, container,showMovieDetails,handleMovieControlChange, updateMovieComments) {
+  constructor(movie, container,showMovieDetails,handleMovieControlChange) {
     this.#movie = movie;
     this.#container = container;
     this.#showMovieDetails = showMovieDetails;
     this.#handleMovieControlChange = handleMovieControlChange;
-    this.#updateMovieComments = updateMovieComments;
+
   }
 
   init = () => {
-    //Получаем комментарии к фильму
-    this.#getComments(this.#movie.id);
-    //Отрисовка данных карточки
-    this.#renderData(this.#movieCardContainer.element);
+    this.#renderData(this.#movieCardContainerComponent.element);
     //Отрисовка управляющих элементов фильма
-    this.#renderControls(this.#movieCardContainer.element);
-    render(this.#movieCardContainer,this.#container);
+    this.#renderControls(this.#movieCardContainerComponent.element);
+    render(this.#movieCardContainerComponent,this.#container);
   };
 
   destroy = () => {
-    remove(this.#movieCardView);
-    remove(this.#movieCardControlsView);
-    remove(this.#movieCardContainer);
+    remove(this.#movieCardComponent);
+    remove(this.#movieCardControlsComponent);
+    remove(this.#movieCardContainerComponent);
   };
 
   updateControls = () => {
-    this.#renderControls(this.#movieCardContainer.element);
-  };
-
-  #getComments = (id) => {
-    this.#movieCommentsModel = new CommentsModel(id);
-    this.#movieComments = [...this.#movieCommentsModel.comments];
-    //Оформляем подписку на изменение модели комментариев
-    this.#movieCommentsModel.addObserver(this.#updateMovieComments);
-  };
-
-  // обработчик событий изменения отоборажения комментариев
-  updateCommentsModel = (actionType, updateType, comment) => {
-    switch (actionType) {
-      case UserAction.ADD:
-        this.#movieCommentsModel.addComment(updateType, comment);
-        break;
-      case UserAction.DELETE:
-        this.#movieCommentsModel.deleteComment(updateType, comment);
-        break;
-    }
+    this.#renderControls(this.#movieCardContainerComponent.element);
   };
 
   updateData = (comments) => {
-    this.#movieComments = comments;
-    this.#movieCommentsModel.comments = this.#movieComments;
-    this.#renderData(this.#movieCardContainer.element);
+    this.#movie.comments = this.#adaptCommentsToMovie(comments);
+    //this.#movieCommentsModel.comments = this.#movieComments;
+    this.#renderData(this.#movieCardContainerComponent.element);
+  };
+
+  #adaptCommentsToMovie = (comments) => {
+    const adaptedComments = [];
+    comments.forEach((comment) => adaptedComments.push({ id: comment.id }));
+    return adaptedComments;
   };
 
   #renderData = (container) => {
-    const prevMovieCardView = this.#movieCardView;
-    this.#movieCardView = new MovieCardView(this.#movie, this.#movieComments );
-    this.#movieCardView.setClickHandler(this.#showMovieDetails);
+    const prevMovieCardComponent = this.#movieCardComponent;
+    this.#movieCardComponent = new MovieCardView(this.#movie, this.#movie.comments );
+    this.#movieCardComponent.setClickHandler(this.#showMovieDetails);
 
-    if ( prevMovieCardView === null || this.#movieCardView === null ) {
-      render(this.#movieCardView,container);
+    if ( prevMovieCardComponent === null || this.#movieCardComponent === null ) {
+      render(this.#movieCardComponent,container);
       return;
     }
 
-    if (container.contains(prevMovieCardView.element)) {
-      replace(this.#movieCardView, prevMovieCardView);
+    if (container.contains(prevMovieCardComponent.element)) {
+      replace(this.#movieCardComponent, prevMovieCardComponent);
     }
 
-    remove(prevMovieCardView);
+    remove(prevMovieCardComponent);
   };
 
   #renderControls = (container) => {
-    const prevMovieCardControlsView = this.#movieCardControlsView;
-    this.#movieCardControlsView = new MovieCardControlsView(this.#movie.controls);
-    this.#movieCardControlsView.setClickHandler(this.#changeMovieControl);
+    const prevMovieCardControlsComponent = this.#movieCardControlsComponent;
+    this.#movieCardControlsComponent = new MovieCardControlsView(this.#movie.controls);
+    this.#movieCardControlsComponent.setClickHandler(this.#changeMovieControl);
 
-    if ( prevMovieCardControlsView === null || this.#movieCardControlsView === null ) {
-      render(this.#movieCardControlsView,container);
+    if ( prevMovieCardControlsComponent === null || this.#movieCardControlsComponent === null ) {
+      render(this.#movieCardControlsComponent,container);
       return;
     }
 
-    if (container.contains(prevMovieCardControlsView.element)) {
-      replace(this.#movieCardControlsView, prevMovieCardControlsView);
+    if (container.contains(prevMovieCardControlsComponent.element)) {
+      replace(this.#movieCardControlsComponent, prevMovieCardControlsComponent);
     }
 
-    remove(prevMovieCardControlsView);
+    remove(prevMovieCardControlsComponent);
   };
 
   #changeMovieControl = (control) => {
