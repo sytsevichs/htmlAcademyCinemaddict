@@ -49,12 +49,8 @@ export default class UiBlocker {
     this.#endTime = Date.now();
     const duration = this.#endTime - this.#startTime;
 
-    if (duration < this.#lowerLimit) {
-      clearTimeout(this.#timerId);
-      return;
-    }
-
     if (duration >= this.#upperLimit) {
+      clearTimeout(this.#timerId);
       this.#removeClass();
       return;
     }

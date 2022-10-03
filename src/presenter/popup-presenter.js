@@ -7,16 +7,18 @@ import MovieDetailsCloseButtomView from '../view/popup/movie-details-close-butto
 import MovieDetailsTopControlsView from '../view/popup/movie-details-top-controls-view.js';
 import MovieDetailsInnerView from '../view/popup/movie-details-inner-view.js';
 import bodyView from '../view/body/body-view.js';
-import { isEscapeKey, updateItemByName } from '../utils/utils.js';
-import { AUTHORITHATION, END_POINT, UpdateType, UserAction } from '../utils/const.js';
+import { isEscapeKey, setAborting, updateItemByName } from '../utils/utils.js';
+import { AUTHORITHATION, END_POINT, UpdateType, UserAction} from '../utils/const.js';
 import CommentsApiService from '../api/comments-api-service.js';
 import CommentsModel from '../model/comments-model.js';
-
+import MovieDetailsCommentsView from '../view/popup/movie-details-comments-view.js';
+import MovieDetailsNewCommentView from '../view/popup/movie-details-new-comment-view;js';
+import MovieDetailsBottomCommentsContainerView from '../view/popup/movie-details-bottom-comments-container-view.js';
 export default class PopupPresenter {
   #movie;
   #comments;
+  #uiBlocker;
   #handleMovieControlChange;
-  #handleCommentsViewEvent;
   #detailsElement;
   #bodyComponent = new bodyView();
   #movieDetailsSectionComponent = new MovieDetailsSectionView();
@@ -25,14 +27,17 @@ export default class PopupPresenter {
   #movieDetailsTopControlsComponent = null;
   #movieDetailsTopInfoComponent;
   #movieDetailsBottomContainerComponent = null;
+  #movieDetailsBottomCommentsContainerComponent = null;
+  #movieDetailsCommentsComponent = null;
+  #movieDetailsNewCommentComponent = null;
   #updateMovieComments;
   #movieCommentsModel;
 
-  constructor(movie,handleMovieControlChange, handleCommentsViewEvent, updateMovieComments) {
+  constructor(movie,handleMovieControlChange, updateMovieComments,uiBlocker) {
     this.#movie = movie;
     this.#handleMovieControlChange = handleMovieControlChange;
-    this.#handleCommentsViewEvent = handleCommentsViewEvent;
     this.#updateMovieComments = updateMovieComments;
+    this.#uiBlocker = uiBlocker;
   }
 
   init = () => {
@@ -89,21 +94,47 @@ export default class PopupPresenter {
   };
 
   #renderBottomContainer = (container) => {
-    this.#comments = [...this.#movieCommentsModel.comments];
-    const prevMovieDetailsBottomContainerComponent = this.#movieDetailsBottomContainerComponent;
-    this.#movieDetailsBottomContainerComponent = new MovieDetailsBottomContainerView(this.#movie.id, this.#comments);
-    this.#movieDetailsBottomContainerComponent.setHandlers(this.#handleCommentsViewEvent);
+    this.#movieDetailsBottomContainerComponent = new MovieDetailsBottomContainerView();
+    this.#movieDetailsBottomCommentsContainerComponent = new MovieDetailsBottomCommentsContainerView();
+    this.#renderComments(this.#movieDetailsBottomCommentsContainerComponent.element);
+    this.#renderNewComment(this.#movieDetailsBottomCommentsContainerComponent.element);
+    render(this.#movieDetailsBottomCommentsContainerComponent, this.#movieDetailsBottomContainerComponent.element);
+    render(this.#movieDetailsBottomContainerComponent, container);
+  };
 
-    if ( prevMovieDetailsBottomContainerComponent === null || this.#movieDetailsBottomContainerComponent === null ) {
-      render(this.#movieDetailsBottomContainerComponent, container);
+  #renderComments = (container) => {
+    this.#comments = [...this.#movieCommentsModel.comments];
+    const prevDetailsCommentsComponent = this.#movieDetailsCommentsComponent;
+    this.#movieDetailsCommentsComponent = new MovieDetailsCommentsView(this.#movie.id, this.#comments);
+    this.#movieDetailsCommentsComponent.setHandlers(this.#handleCommentsViewEvent);
+
+    if ( prevDetailsCommentsComponent === null || this.#movieDetailsCommentsComponent === null ) {
+      render(this.#movieDetailsCommentsComponent, container);
       return;
     }
 
-    if (container.contains(prevMovieDetailsBottomContainerComponent.element)) {
-      replace(this.#movieDetailsBottomContainerComponent, prevMovieDetailsBottomContainerComponent);
+    if (container.contains(prevDetailsCommentsComponent.element)) {
+      replace(this.#movieDetailsCommentsComponent, prevDetailsCommentsComponent);
     }
 
-    remove(prevMovieDetailsBottomContainerComponent);
+    remove(prevDetailsCommentsComponent);
+  };
+
+  #renderNewComment = (container) => {
+    const prevDetailsNewCommentComponent = this.#movieDetailsNewCommentComponent;
+    this.#movieDetailsNewCommentComponent = new MovieDetailsNewCommentView();
+    this.#movieDetailsNewCommentComponent.setHandlers(this.#handleCommentsViewEvent);
+
+    if ( prevDetailsNewCommentComponent === null || this.#movieDetailsNewCommentComponent === null ) {
+      render(this.#movieDetailsNewCommentComponent, container);
+      return;
+    }
+
+    if (container.contains(prevDetailsNewCommentComponent.element)) {
+      replace(this.#movieDetailsNewCommentComponent, prevDetailsNewCommentComponent);
+    }
+
+    remove(prevDetailsNewCommentComponent);
   };
 
   #closeDetailsView = () => {
@@ -116,7 +147,7 @@ export default class PopupPresenter {
   #changeMovieControl = (control) => {
     control.active = !control.active;
     this.#movie.controls = updateItemByName(this.#movie.controls, control);
-    this.#handleMovieControlChange(UserAction.UPDATE, UpdateType.PATCH, this.#movie);
+    this.#handleMovieControlChange(UserAction.UPDATE, UpdateType.PATCH, this.#movie, this.#movieDetailsTopControlsComponent);
   };
 
   #setEscapeListener = () => {
@@ -136,19 +167,31 @@ export default class PopupPresenter {
   };
 
   // обработчик событий изменения отоборажения комментариев
-  updateCommentsModel = (actionType, updateType, comment) => {
+  #handleCommentsViewEvent = async (actionType, updateType, comment) => {
+    this.#uiBlocker.block();
     switch (actionType) {
       case UserAction.ADD:
-        this.#movieCommentsModel.addComment(updateType, comment);
+        try {
+          await this.#movieCommentsModel.addComment(updateType, comment);
+        } catch (error) {
+          setAborting(this.#movieDetailsNewCommentComponent);
+        }
         break;
       case UserAction.DELETE:
-        this.#movieCommentsModel.deleteComment(updateType, comment);
+        try {
+          await this.#movieCommentsModel.deleteComment(updateType, comment);
+        } catch (error) {
+          setAborting(this.#movieDetailsCommentsComponent);
+        }
         break;
     }
+    this.#uiBlocker.unblock();
   };
 
   updateBottomContainer = () => {
-    this.#renderBottomContainer(this.#movieDetailsInnerComponent.element);
+    this.#uiBlocker.unblock();
+    this.#renderComments(this.#movieDetailsBottomCommentsContainerComponent.element);
+    this.#renderNewComment(this.#movieDetailsBottomCommentsContainerComponent.element);
   };
 
   closeDetailsView = () => this.#closeDetailsView();
@@ -156,4 +199,6 @@ export default class PopupPresenter {
   updateControls = (controls) => {
     this.#renderControls(controls, this.#movieDetailsTopContainerComponent.element);
   };
+
+
 }

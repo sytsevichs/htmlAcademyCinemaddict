@@ -33,27 +33,34 @@ export default class CommentsModel extends Observer {
   };
 
 
-  addComment = (updateType, update) => {
-    this.#comments = [
-      update,
-      ...this.#comments,
-    ];
-
-    this._notify(updateType, this.#movieId, this.#comments);
+  addComment = async (updateType, update) => {
+    try {
+      const response = await this.#commentsService.addComment(update);
+      this.#comments = [...response.comments];
+      this._notify(updateType, this.#movieId, this.#comments);
+    } catch (error) {
+      throw new Error(`Can't update movie: ${error}`);
+    }
   };
 
-  deleteComment = (updateType, update) => {
+  deleteComment = async (updateType, update) => {
     const index = this.#comments.findIndex((comment) => comment.id === update.id);
 
     if (index === -1) {
       throw new Error('Can\'t delete unexisting comment');
     }
 
-    this.#comments = [
-      ...this.#comments.slice(0, index),
-      ...this.#comments.slice(index + 1),
-    ];
+    try {
+      await this.#commentsService.deleteComment(update);
 
-    this._notify(updateType, this.#movieId, this.#comments);
+      this.#comments = [
+        ...this.#comments.slice(0, index),
+        ...this.#comments.slice(index + 1),
+      ];
+
+      this._notify(updateType, this.#movieId, this.#comments);
+    } catch (error) {
+      throw new Error(`Can't update movie: ${error}`);
+    }
   };
 }
