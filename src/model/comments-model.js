@@ -1,5 +1,6 @@
-import { UpdateType } from '../utils/const.js';
+import { OBJECT_TYPE, UpdateType } from '../utils/const.js';
 import Observer from '../framework/observable.js';
+import { errorHeadling } from '../utils/utils.js';
 export default class CommentsModel extends Observer {
 
   #movieId;
@@ -33,27 +34,34 @@ export default class CommentsModel extends Observer {
   };
 
 
-  addComment = (updateType, update) => {
-    this.#comments = [
-      update,
-      ...this.#comments,
-    ];
-
-    this._notify(updateType, this.#movieId, this.#comments);
+  addComment = async (updateType, localComment) => {
+    try {
+      const response = await this.#commentsService.addComment(localComment);
+      this.#comments = [...response.comments];
+      this._notify(updateType, this.#movieId, this.#comments);
+    } catch (error) {
+      errorHeadling(error, OBJECT_TYPE.COMMENT);
+    }
   };
 
-  deleteComment = (updateType, update) => {
+  deleteComment = async (updateType, update) => {
     const index = this.#comments.findIndex((comment) => comment.id === update.id);
 
     if (index === -1) {
       throw new Error('Can\'t delete unexisting comment');
     }
 
-    this.#comments = [
-      ...this.#comments.slice(0, index),
-      ...this.#comments.slice(index + 1),
-    ];
+    try {
+      await this.#commentsService.deleteComment(update);
 
-    this._notify(updateType, this.#movieId, this.#comments);
+      this.#comments = [
+        ...this.#comments.slice(0, index),
+        ...this.#comments.slice(index + 1),
+      ];
+
+      this._notify(updateType, this.#movieId, this.#comments);
+    } catch (error) {
+      errorHeadling(error, OBJECT_TYPE.COMMENT);
+    }
   };
 }

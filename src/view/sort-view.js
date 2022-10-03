@@ -8,26 +8,28 @@ const createSortInemTemplate = (sorting,isChecked) => {
           </li>`);
 };
 
-const createSortViewTemplate = (sortItems,current) => {
+const createSortViewTemplate = (sortItems,current, isVisible) => {
   const sortItemsTemplate = sortItems
     .map((sorting) => createSortInemTemplate(sorting, sorting.name === current))
     .join('');
 
   return `<ul class="sort">
-    ${sortItemsTemplate}
+    ${isVisible ? sortItemsTemplate : ''}
     </ul>`;
 };
 
 export default class SortView extends AbstactView {
   #currentSortType;
+  #isVisible;
 
-  constructor(sortType) {
+  constructor(sortType, isVisible) {
     super();
     this.#currentSortType = sortType;
+    this.#isVisible = isVisible;
   }
 
   get template() {
-    return createSortViewTemplate(generateSorting(), this.#currentSortType);
+    return createSortViewTemplate(generateSorting(), this.#currentSortType, this.#isVisible);
   }
 
   setClickHandler = (callback) => {

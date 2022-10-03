@@ -1,6 +1,7 @@
 
 import { render,remove, replace } from '../framework/render.js';
-import { FilterMessage, FilterType, MoviesUpdateGroup, MOVIES_NUMBER_PER_STEP, SortType, UpdateType, UserAction } from '../utils/const.js';
+import { FilterMessage, FilterType, MoviesUpdateGroup, MOVIES_NUMBER_PER_STEP, SortType, UpdateType, UserAction, TimeLimit} from '../utils/const.js';
+import FilterModel from '../model/filters-model.js';
 import FilterNavigationView from '../view/filter-navigation-view.js';
 import SortView from '../view/sort-view.js';
 import MoviesContainerView from '../view/movies/movies-container-view.js';
@@ -10,12 +11,15 @@ import MoviesView from '../view/movies/movies-view.js';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
 import MoviePresenter from './movie-presenter.js';
 import PopupPresenter from './popup-presenter.js';
-import { sortByDateUp, sortByDateDown, sortByRatingUp, sortByRatingDown } from '../utils/utils.js';
-import FilterModel from '../model/filters-model.js';
+import { sortByDateUp, sortByDateDown, sortByRatingUp, sortByRatingDown, setAborting } from '../utils/utils.js';
 import LoadingView from '../view/loading-view.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 export default class BoardPresenter {
   #boardContainer;
+  #moviesModel;
+  #filtersModel;
+  #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
   #moviesComponent = new MoviesView();
   #moviesListComponent = new MoviesListView();
   #moviesContainerComponent = new MoviesContainerView();
@@ -24,12 +28,10 @@ export default class BoardPresenter {
   #listMesssageComponent = null;
   #filtersNavigationComponent = null;
   #sortComponent = null;
-  #moviesModel;
-  #boardMovies;
+  #boardMovies = [];
   #moviesLength;
   #renderedMoviesCount = MOVIES_NUMBER_PER_STEP;
   #filters;
-  #filtersModel;
   #moviesPresenter = new Map();
   #popupPresenter;
   #popupMovieId = null;
@@ -39,14 +41,15 @@ export default class BoardPresenter {
   #currentSortDirection = true;
   #isLoading = true;
 
-  constructor(container, moviesModel) {
+  constructor(container, moviesModel, filtersModel) {
     this.#boardContainer = container;
     this.#moviesModel = moviesModel;
+    this.#filtersModel = filtersModel;
   }
 
   init = () => {
     this.#moviesModel.addObserver(this.#handleUpdateMoviesList, MoviesUpdateGroup.ALL);
-    this.#filtersModel = new FilterModel(this.#moviesModel.movies);
+    this.#filtersModel = new FilterModel(this.#moviesModel);
     this.#filtersModel.addObserver(this.#handleFilterModelUpdate);
     this.#renderBoard();
   };
@@ -92,8 +95,9 @@ export default class BoardPresenter {
       this.#newSortType = SortType.DEFAULT;
     }
     const prevSortComponent = this.#sortComponent;
-    this.#sortComponent = new SortView(this.#newSortType);
+    this.#sortComponent = new SortView( this.#newSortType, this.#boardMovies.length > 0 );
     this.#sortComponent.setClickHandler(this.#handleSortingChange);
+
     if ( prevSortComponent === null || this.#sortComponent === null ) {
       render(this.#sortComponent, this.#boardContainer);
       return;
@@ -148,6 +152,7 @@ export default class BoardPresenter {
     }
     this.#renderMoviesListMessage();
     this.#renderMovies(this.#boardMovies);
+    this.#renderSorting();
   };
 
   #renderMoviesContainer = () => {
@@ -192,6 +197,7 @@ export default class BoardPresenter {
   };
 
   #handleUpdateMoviesList = (updateType, userAction, movies) => {
+    this.#uiBlocker.block();
     if (userAction === UserAction.UPDATE) {
       switch (updateType) {
         case UpdateType.INIT:
@@ -204,6 +210,7 @@ export default class BoardPresenter {
           break;
       }
     }
+    this.#uiBlocker.unblock();
   };
 
   #renderShowMoreButton = () => {
@@ -237,12 +244,13 @@ export default class BoardPresenter {
     if (this.#popupPresenter) {
       this.#popupPresenter.closeDetailsView();
     }
-    this.#popupPresenter = new PopupPresenter(movie, this.#handleMovieControlViewEvent, this.#handleCommentsViewEvent,this.#handleCommentsModelEvent);
+    this.#popupPresenter = new PopupPresenter(movie, this.#handleMovieControlViewEvent, this.#handleCommentsModelEvent,this.#uiBlocker);
     this.#popupPresenter.init();
   };
 
   // обработчик событий изменения модели элементов управления в представлениях
   #handleMovieControlModelEvent = (updateType, id, movie) => {
+    this.#uiBlocker.block();
     switch (updateType) {
       case UpdateType.PATCH:
         this.#moviesPresenter.get(id).updateControls();
@@ -255,39 +263,42 @@ export default class BoardPresenter {
       default:
         break;
     }
+    this.#uiBlocker.unblock();
   };
 
   // обработчик событий изменения модели элементов управления одного фильма
-  #handleMovieControlViewEvent = (actionType, updateType, movie) => {
+  #handleMovieControlViewEvent = async (actionType, updateType, movie, component) => {
+    this.#uiBlocker.block();
     switch (actionType) {
       case UserAction.UPDATE:
-        this.#moviesModel.updateSingleMovie(updateType,movie);
+        try {
+          await this.#moviesModel.updateSingleMovie(updateType,movie);
+        } catch (error) {
+          setAborting(component);
+        }
         break;
       default:
         break;
     }
-
-  };
-
-  // обработчик событий изменения модели комментариев
-  #handleCommentsViewEvent = (actionType, updateType, movieId, comment) => {
-    // Обновление модели комментариев
-    this.#popupPresenter.updateCommentsModel(actionType, updateType, comment);
+    this.#uiBlocker.unblock();
   };
 
   // обработчик событий изменения модели комментариев
   #handleCommentsModelEvent = (updateType, movieId, comments) => {
     // Обновление модели комментариев
+    this.#uiBlocker.block();
     switch (updateType) {
       case UpdateType.INIT:
         this.#popupPresenter.updateBottomContainer();
         break;
       case UpdateType.PATCH:
         this.#moviesPresenter.get(movieId).updateData(comments);
+        this.#popupPresenter.updateBottomContainer();
         break;
       default:
         break;
     }
+    this.#uiBlocker.unblock();
   };
 
   #clearMoviesList = () => {

@@ -1,20 +1,12 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import { MINUTES_IN_HOUR } from './const';
+import Randomstring from 'randomstring';
+import { ERROR_TYPE, MINUTES_IN_HOUR } from './const';
 
 dayjs.extend(duration);
 
 //Обработка клавиш
 const isEscapeKey = (evt) => evt.key === 'Escape';
-
-const getRandomDate = (start, end) => new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
-
-const getRandomInteger = (a = 0, b = 1) => {
-  const lower = Math.ceil(Math.min(a, b));
-  const upper = Math.floor(Math.max(a, b));
-
-  return Math.floor(lower + Math.random() * (upper - lower + 1));
-};
 
 const formatDateToYear = (date) => dayjs(date).format('YYYY');
 const formatDateDescription = (date) => dayjs(date).format('YYYY/MM/DD HH:MM');
@@ -83,10 +75,39 @@ const sortByRatingDown = (movieA, movieB) => {
   return weight ?? movieB.filmInfo.totalRating - movieA.filmInfo.totalRating;
 };
 
+const setAborting = (compoment,shake = true) => {
+  if (shake) {
+    compoment.shake();
+  }
+  const resetFormState = () => {
+    compoment.updateElement({
+      isSaving: false,
+      isDeleting: null,
+    });
+  };
+
+  compoment.shake(resetFormState);
+};
+
+const authorization = () => `Basic ${new Randomstring.generate()}`;
+
+const errorHeadling = (error, object) => {
+  switch (error.message.split(':')[0]) {
+    case ERROR_TYPE.AUTHORIZATION.code:
+      this.messageText = ERROR_TYPE.AUTHORIZATION.text;
+      break;
+    case ERROR_TYPE.NOTFOUND.code:
+      this.messageText = ERROR_TYPE.NOTFOUND.text;
+      break;
+    default:
+      this.messageText = `${ERROR_TYPE.DEFAULT.text} ${object}:`;
+      break;
+  }
+  throw new Error(`${this.messageText} ${error}`);
+};
+
 export {
   isEscapeKey,
-  getRandomDate,
-  getRandomInteger,
   formatDateToYear,
   formatDateDescription,
   formatMinutesToTime,
@@ -97,4 +118,7 @@ export {
   sortByDateDown,
   sortByRatingUp,
   sortByRatingDown,
+  setAborting,
+  authorization,
+  errorHeadling,
 };
