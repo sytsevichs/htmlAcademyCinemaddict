@@ -2,7 +2,17 @@ const MOVIES_NUMBER_PER_STEP = 5;
 const MINUTES_IN_HOUR = 60;
 
 const END_POINT = 'https://18.ecmascript.pages.academy/cinemaddict';
-const AUTHORITHATION = 'Basic 1qaz@WSX3edc$RFV5tgb';
+
+const ERROR_TYPE = {
+  AUTHORIZATION: {code: '401', text: ''},
+  NOTFOUND: {code: '404', text: '' },
+  DEFAULT: {text: 'Can\'t update ' },
+};
+
+const OBJECT_TYPE = {
+  MOVIE: 'movie',
+  COMMENT: 'comment',
+};
 
 const EMOTIONS = [
   {
@@ -28,7 +38,6 @@ const CONTROL_TYPES = {
   watched: 1,
   favorite: 2,
 };
-
 
 const CONTROLS = [
   {
@@ -102,9 +111,9 @@ const FilterMessage = {
 };
 
 const UserAction = {
-  UPDATE: 'UPDATE',
-  ADD: 'ADD',
-  DELETE: 'DELETE',
+  UPDATE: 'update',
+  ADD: 'add',
+  DELETE: 'delete',
 };
 
 const UpdateType = {
@@ -128,8 +137,9 @@ const TimeLimit = {
 export {
   MOVIES_NUMBER_PER_STEP,
   MINUTES_IN_HOUR,
-  AUTHORITHATION,
   END_POINT,
+  ERROR_TYPE,
+  OBJECT_TYPE,
   EMOTIONS,
   CONTROL_TYPES,
   CONTROLS,

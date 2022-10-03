@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import { MINUTES_IN_HOUR } from './const';
+import Randomstring from 'randomstring';
+import { ERROR_TYPE, MINUTES_IN_HOUR } from './const';
 
 dayjs.extend(duration);
 
@@ -88,6 +89,23 @@ const setAborting = (compoment,shake = true) => {
   compoment.shake(resetFormState);
 };
 
+const authorization = () => `Basic ${new Randomstring.generate()}`;
+
+const errorHeadling = (error, object) => {
+  switch (error.message.split(':')[0]) {
+    case ERROR_TYPE.AUTHORIZATION.code:
+      this.messageText = ERROR_TYPE.AUTHORIZATION.text;
+      break;
+    case ERROR_TYPE.NOTFOUND.code:
+      this.messageText = ERROR_TYPE.NOTFOUND.text;
+      break;
+    default:
+      this.messageText = `${ERROR_TYPE.DEFAULT.text} ${object}:`;
+      break;
+  }
+  throw new Error(`${this.messageText} ${error}`);
+};
+
 export {
   isEscapeKey,
   formatDateToYear,
@@ -101,4 +119,6 @@ export {
   sortByRatingUp,
   sortByRatingDown,
   setAborting,
+  authorization,
+  errorHeadling,
 };

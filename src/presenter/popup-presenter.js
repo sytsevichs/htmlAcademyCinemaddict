@@ -7,8 +7,8 @@ import MovieDetailsCloseButtomView from '../view/popup/movie-details-close-butto
 import MovieDetailsTopControlsView from '../view/popup/movie-details-top-controls-view.js';
 import MovieDetailsInnerView from '../view/popup/movie-details-inner-view.js';
 import bodyView from '../view/body/body-view.js';
-import { isEscapeKey, setAborting, updateItemByName } from '../utils/utils.js';
-import { AUTHORITHATION, END_POINT, UpdateType, UserAction} from '../utils/const.js';
+import { authorization, isEscapeKey, setAborting, updateItemByName } from '../utils/utils.js';
+import { END_POINT, UpdateType, UserAction} from '../utils/const.js';
 import CommentsApiService from '../api/comments-api-service.js';
 import CommentsModel from '../model/comments-model.js';
 import MovieDetailsCommentsView from '../view/popup/movie-details-comments-view.js';
@@ -160,7 +160,7 @@ export default class PopupPresenter {
   };
 
   #initComments = (id) => {
-    this.#movieCommentsModel = new CommentsModel(id, new CommentsApiService(id, END_POINT, AUTHORITHATION));
+    this.#movieCommentsModel = new CommentsModel(id, new CommentsApiService(id, END_POINT, authorization));
     this.#movieCommentsModel.init();
     //Оформляем подписку на изменение модели комментариев
     this.#movieCommentsModel.addObserver(this.#updateMovieComments);

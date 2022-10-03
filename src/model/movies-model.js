@@ -1,6 +1,6 @@
-import { CONTROLS, MoviesUpdateGroup, UpdateType, UserAction } from '../utils/const.js';
+import { CONTROLS, MoviesUpdateGroup, OBJECT_TYPE, UpdateType, UserAction } from '../utils/const.js';
 import Observer from '../framework/observable.js';
-import { updateItemById } from '../utils/utils.js';
+import { errorHeadling, updateItemById } from '../utils/utils.js';
 
 export default class MoviesModel extends Observer {
   #movies = null;
@@ -47,7 +47,7 @@ export default class MoviesModel extends Observer {
       this.#movies = updateItemById(this.#movies, updateMovie);
       this._notify(updateType, movie.id, movie, MoviesUpdateGroup.SINGLE);
     } catch (error) {
-      throw new Error(`Can't update movie: ${error}`);
+      errorHeadling(error, OBJECT_TYPE.MOVIE);
     }
     //Вызываем все обработчики, зарегистированные для обновления одного фильма
 

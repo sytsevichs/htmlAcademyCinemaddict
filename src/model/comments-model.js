@@ -1,5 +1,6 @@
-import { UpdateType } from '../utils/const.js';
+import { OBJECT_TYPE, UpdateType } from '../utils/const.js';
 import Observer from '../framework/observable.js';
+import { errorHeadling } from '../utils/utils.js';
 export default class CommentsModel extends Observer {
 
   #movieId;
@@ -33,13 +34,13 @@ export default class CommentsModel extends Observer {
   };
 
 
-  addComment = async (updateType, update) => {
+  addComment = async (updateType, localComment) => {
     try {
-      const response = await this.#commentsService.addComment(update);
+      const response = await this.#commentsService.addComment(localComment);
       this.#comments = [...response.comments];
       this._notify(updateType, this.#movieId, this.#comments);
     } catch (error) {
-      throw new Error(`Can't update movie: ${error}`);
+      errorHeadling(error, OBJECT_TYPE.COMMENT);
     }
   };
 
@@ -60,7 +61,7 @@ export default class CommentsModel extends Observer {
 
       this._notify(updateType, this.#movieId, this.#comments);
     } catch (error) {
-      throw new Error(`Can't update movie: ${error}`);
+      errorHeadling(error, OBJECT_TYPE.COMMENT);
     }
   };
 }
