@@ -1,6 +1,6 @@
 
 import { render,remove, replace } from '../framework/render.js';
-import { FilterMessage, FilterType, MoviesUpdateGroup, MOVIES_NUMBER_PER_STEP, SortType, UpdateType, UserAction, TimeLimit} from '../utils/const.js';
+import { FilterMessage, FilterType, MoviesUpdateGroup, MOVIES_NUMBER_PER_STEP, SortType, UpdateType, UserAction, TimeLimit, EXTRA_LIST_TYPES, EXTRA_TOP_LISTS} from '../utils/const.js';
 import FilterModel from '../model/filters-model.js';
 import FilterNavigationView from '../view/filter-navigation-view.js';
 import SortView from '../view/sort-view.js';
@@ -11,9 +11,11 @@ import MoviesView from '../view/movies/movies-view.js';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
 import MoviePresenter from './movie-presenter.js';
 import PopupPresenter from './popup-presenter.js';
-import { sortByDateUp, sortByDateDown, sortByRatingUp, sortByRatingDown, setAborting } from '../utils/utils.js';
+import { sortByDateUp, sortByDateDown, sortByRatingUp, sortByRatingDown, sortByComments, setAborting } from '../utils/utils.js';
 import LoadingView from '../view/loading-view.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+import MoviesListExtraView from '../view/movies/movies-list-extra-view.js';
+import MoviesListExtraMesssageView from '../view/movies/movies-list-extra-message-view.js';
 
 export default class BoardPresenter {
   #boardContainer;
@@ -33,6 +35,8 @@ export default class BoardPresenter {
   #renderedMoviesCount = MOVIES_NUMBER_PER_STEP;
   #filters;
   #moviesPresenter = new Map();
+  #moviesExtraPresenter = new Map();
+  #moviesExtraListsGarbageCollector = [];
   #popupPresenter;
   #popupMovieId = null;
   #currentFilter = null;
@@ -57,7 +61,9 @@ export default class BoardPresenter {
   #renderBoard = () => {
     this.#renderFilters();
     this.#renderSorting();
+    this.#renderMoviesContainer();
     this.#updateMoviesList();
+    this.#renderExtraLists();
   };
 
   #renderFilters = () => {
@@ -121,6 +127,11 @@ export default class BoardPresenter {
     this.#renderMoviesList();
   };
 
+  #updateExtraLists = () => {
+    this.#clearExtraLists();
+    this.#renderExtraLists();
+  };
+
   get movies() {
     if (this.#currentSortType === this.#newSortType) {
       this.#currentSortDirection = !this.#currentSortDirection;
@@ -140,19 +151,57 @@ export default class BoardPresenter {
   }
 
   #renderMoviesList = () => {
-    this.#renderMoviesContainer();
-    //Запоминаем и выводим сортированный список
-    if (!this.#currentFilter || this.#currentFilter === FilterType.all ) {
-      this.#currentFilter = FilterType.all;
-      this.#boardMovies = this.movies;
-    } else {
-      this.#boardMovies = this.movies
-        .filter((movie) => this.#filters
-          .filter((filter) => filter.active).every((filter) => movie.controls.filter((control) => control.active).some((control) =>control.name === filter.name) ));
-    }
+    this.#boardMovies = this.#filterBoardMovies();
     this.#renderMoviesListMessage();
     this.#renderMovies(this.#boardMovies);
     this.#renderSorting();
+  };
+
+  #renderExtraLists = () => {
+    if (this.#moviesModel.movies.length) {
+      Array.from(EXTRA_TOP_LISTS, (extraList) => {
+        this.#renderExtraList(extraList);
+      });
+    }
+  };
+
+  #renderExtraList = (extraList) => {
+    const newExtraListComponent = new MoviesListExtraView();
+    render(newExtraListComponent,this.#moviesComponent.element);
+    this.#moviesExtraListsGarbageCollector.push(newExtraListComponent);
+    const extraListMovies = [...this.#filterExtraListMovies(extraList.type, extraList.number)];
+    const newListExtraMessageComponent = new MoviesListExtraMesssageView(extraListMovies.length,extraList.name);
+    render(newListExtraMessageComponent,newExtraListComponent.element);
+    this.#moviesExtraListsGarbageCollector.push(newListExtraMessageComponent);
+    const newExtraMoviesContaineComponent = new MoviesContainerView();
+    render(newExtraMoviesContaineComponent,newListExtraMessageComponent.element);
+    this.#moviesExtraListsGarbageCollector.push(newExtraMoviesContaineComponent);
+    Array.from({length: extraList.number}, (a ,index) => {
+      this.#renderMovie(extraListMovies[index],newExtraMoviesContaineComponent.element,extraList.type);
+    });
+
+  };
+
+  #filterExtraListMovies = (sortType, maxNumber) => {
+    switch (sortType) {
+      case EXTRA_LIST_TYPES.RATING:
+        return [...this.#moviesModel.movies].filter((movie) => movie.filmInfo.totalRating).sort(sortByRatingDown).splice(0,maxNumber);
+      case EXTRA_LIST_TYPES.COMMENTS:
+        return [...this.#moviesModel.movies].sort(sortByComments).splice(0,maxNumber);
+      default:
+        return [...this.#moviesModel.movies].splice(0,maxNumber);
+    }
+  };
+
+  #filterBoardMovies = () => {
+    if (!this.#currentFilter || this.#currentFilter === FilterType.all ) {
+      this.#currentFilter = FilterType.all;
+      return this.movies;
+    } else {
+      return this.movies
+        .filter((movie) => this.#filters
+          .filter((filter) => filter.active).every((filter) => movie.controls.filter((control) => control.active).some((control) =>control.name === filter.name) ));
+    }
   };
 
   #renderMoviesContainer = () => {
@@ -184,16 +233,21 @@ export default class BoardPresenter {
     render(this.#moviesContainerComponent,this.#moviesListComponent.element);
 
     Array.from({length: Math.min(this.#moviesLength,MOVIES_NUMBER_PER_STEP)}, (a ,index) => {
-      this.#renderMovie(movies[index]);
+      this.#renderMovie(movies[index],this.#moviesContainerComponent.element);
     });
 
     this.#renderShowMoreButton();
   };
 
-  #renderMovie = (movie) => {
-    const moviePresenter = new MoviePresenter(movie, this.#moviesContainerComponent.element, this.#showMovieDetails, this.#handleMovieControlViewEvent);
+  #renderMovie = (movie,container, extra = null) => {
+    const moviePresenter = new MoviePresenter(movie, container, this.#showMovieDetails, this.#handleMovieControlViewEvent);
     moviePresenter.init();
-    this.#moviesPresenter.set(movie.id, moviePresenter);
+
+    if (extra) {
+      this.#moviesExtraPresenter.set(movie.id, moviePresenter);
+    } else {
+      this.#moviesPresenter.set(movie.id, moviePresenter);
+    }
   };
 
   #handleUpdateMoviesList = (updateType, userAction, movies) => {
@@ -229,7 +283,7 @@ export default class BoardPresenter {
   #handleShowMoreButtonClick = () => {
     this.#boardMovies
       .slice(this.#renderedMoviesCount, this.#renderedMoviesCount + MOVIES_NUMBER_PER_STEP)
-      .forEach((movie) => this.#renderMovie(movie));
+      .forEach((movie) => this.#renderMovie(movie, this.#moviesContainerComponent.element));
 
     this.#renderedMoviesCount += MOVIES_NUMBER_PER_STEP;
 
@@ -253,8 +307,13 @@ export default class BoardPresenter {
     this.#uiBlocker.block();
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#moviesPresenter.get(id).updateControls();
-        if (this.#popupMovieId === id) {
+        if (this.#moviesPresenter.get(id)) {
+          this.#moviesPresenter.get(id).updateControls();
+        }
+        if (this.#moviesExtraPresenter.get(id)) {
+          this.#moviesExtraPresenter.get(id).updateControls();
+        }
+        if (this.#popupMovieId === id && this.#popupPresenter) {
           this.#popupPresenter.updateControls(movie.controls);
         }
         this.#renderFilters();
@@ -292,7 +351,15 @@ export default class BoardPresenter {
         this.#popupPresenter.updateBottomContainer();
         break;
       case UpdateType.PATCH:
-        this.#moviesPresenter.get(movieId).updateData(comments);
+
+        if (this.#moviesPresenter.get(movieId)) {
+          this.#moviesPresenter.get(movieId).updateData(comments);
+        }
+        if (this.#moviesExtraPresenter.get(movieId)) {
+          this.#moviesExtraPresenter.get(movieId).updateData(comments);
+          this.#updateExtraLists();
+        }
+
         this.#popupPresenter.updateBottomContainer();
         break;
       default:
@@ -306,6 +373,13 @@ export default class BoardPresenter {
     this.#moviesPresenter.clear();
     this.#renderedMoviesCount = MOVIES_NUMBER_PER_STEP;
     remove(this.#showMoreButtonComponent);
+  };
+
+  #clearExtraLists = () => {
+    this.#moviesExtraPresenter.forEach((presenter) => presenter.destroy());
+    this.#moviesExtraPresenter.clear();
+    this.#moviesExtraListsGarbageCollector.forEach((element)=>remove(element));
+    this.#moviesExtraListsGarbageCollector = [];
   };
 
 }

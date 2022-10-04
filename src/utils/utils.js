@@ -75,18 +75,24 @@ const sortByRatingDown = (movieA, movieB) => {
   return weight ?? movieB.filmInfo.totalRating - movieA.filmInfo.totalRating;
 };
 
-const setAborting = (compoment,shake = true) => {
+const sortByComments = (movieA, movieB) => {
+  const weight = getWeightForNull(movieA.comments.length, movieB.comments.length);
+
+  return weight ?? movieB.comments.length - movieA.comments.length;
+};
+
+const setAborting = (component,shake = true) => {
   if (shake) {
-    compoment.shake();
+    component.shake();
   }
   const resetFormState = () => {
-    compoment.updateElement({
+    component.updateElement({
       isSaving: false,
       isDeleting: null,
     });
   };
 
-  compoment.shake(resetFormState);
+  component.shake(resetFormState);
 };
 
 const authorization = () => `Basic ${new Randomstring.generate()}`;
@@ -118,6 +124,7 @@ export {
   sortByDateDown,
   sortByRatingUp,
   sortByRatingDown,
+  sortByComments,
   setAborting,
   authorization,
   errorHeadling,

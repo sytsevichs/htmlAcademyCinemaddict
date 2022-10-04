@@ -393,6 +393,7 @@ button {
   flex-grow: 0;
   flex-shrink: 0;
   padding-bottom: 0;
+  float: left;
 }
 
 .films-list--extra:last-of-type {

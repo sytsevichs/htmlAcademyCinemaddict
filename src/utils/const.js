@@ -33,6 +33,24 @@ const EMOTIONS = [
   },
 ];
 
+const EXTRA_LIST_TYPES = {
+  RATING: 'RATING',
+  COMMENTS: 'COMMENTS',
+};
+
+const EXTRA_TOP_LISTS = [
+  {
+    type: EXTRA_LIST_TYPES.RATING,
+    name: 'Top Rated',
+    number: 2,
+  },
+  {
+    type:  EXTRA_LIST_TYPES.COMMENTS,
+    name:'Most Commented',
+    number: 2,
+  }
+];
+
 const CONTROL_TYPES = {
   watchlist: 0,
   watched: 1,
@@ -141,6 +159,8 @@ export {
   ERROR_TYPE,
   OBJECT_TYPE,
   EMOTIONS,
+  EXTRA_LIST_TYPES,
+  EXTRA_TOP_LISTS,
   CONTROL_TYPES,
   CONTROLS,
   ACTIVE_CONTROL,
