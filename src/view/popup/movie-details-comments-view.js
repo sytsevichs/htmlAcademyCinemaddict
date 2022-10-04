@@ -1,8 +1,13 @@
 import AbstractStatefulView from '../../framework/view/abstract-stateful-view.js';
 import {UpdateType, UserAction
 } from '../../utils/const.js';
+import TimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en';
+TimeAgo.addDefaultLocale(en);
 
-const createMovieCommentItemTemplate = (comment, isDisabled) => (
+const commentDate = (date) => new Date(date);
+
+const createMovieCommentItemTemplate = (comment, isDisabled, timeAgo) => (
   `<li class="film-details__comment">
     <span class="film-details__comment-emoji">
       <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-${comment.emotion}">
@@ -11,17 +16,17 @@ const createMovieCommentItemTemplate = (comment, isDisabled) => (
       <p class="film-details__comment-text">${comment.comment}</p>
       <p class="film-details__comment-info">
         <span class="film-details__comment-author">${comment.author}</span>
-        <span class="film-details__comment-day">${comment.date}</span>
+        <span class="film-details__comment-day">${timeAgo.format(Date.now() - commentDate(comment.date))}</span>
         <button class="film-details__comment-delete" data-id="${comment.id}"${isDisabled ? 'disabled>Deleting...' : '>Delete'}</button>
       </p>  
     </div>
   </li>`
 );
 
-const createMovieCommentsContainerTemplate = (comments, deletingCommentId) => {
+const createMovieCommentsContainerTemplate = (comments, deletingCommentId, timeAgo) => {
   const commentsText = comments.length === 1 ? 'comment' : 'comments';
   const commentItemsTemplate = comments
-    .map((comment) => createMovieCommentItemTemplate(comment, comment.id === deletingCommentId))
+    .map((comment) => createMovieCommentItemTemplate(comment, comment.id === deletingCommentId, timeAgo))
     .join('');
 
   return (`
@@ -34,11 +39,13 @@ const createMovieCommentsContainerTemplate = (comments, deletingCommentId) => {
 };
 
 export default class MovieDetailsCommentsView extends AbstractStatefulView {
-  #comments;
+  #timeAgo;
 
   constructor(movieid, comments) {
     super();
     this._state = MovieDetailsCommentsView.parseCommentsToState(movieid, comments);
+
+    this.#timeAgo = new TimeAgo('en-US');
   }
 
   static parseCommentsToState = (movieId,comments) => ({
@@ -85,6 +92,6 @@ export default class MovieDetailsCommentsView extends AbstractStatefulView {
   };
 
   get template() {
-    return createMovieCommentsContainerTemplate(this._state.comments, this._state.isDeleting);
+    return createMovieCommentsContainerTemplate(this._state.comments, this._state.isDeleting, this.#timeAgo);
   }
 }
