@@ -12,7 +12,7 @@ import { END_POINT, UpdateType, UserAction} from '../utils/const.js';
 import CommentsApiService from '../api/comments-api-service.js';
 import CommentsModel from '../model/comments-model.js';
 import MovieDetailsCommentsView from '../view/popup/movie-details-comments-view.js';
-import MovieDetailsNewCommentView from '../view/popup/movie-details-new-comment-view;js';
+import MovieDetailsNewCommentView from '../view/popup/movie-details-new-comment-view.js';
 import MovieDetailsBottomCommentsContainerView from '../view/popup/movie-details-bottom-comments-container-view.js';
 export default class PopupPresenter {
   #movie;
