@@ -311,7 +311,7 @@ export default class BoardPresenter {
           this.#moviesPresenter.get(id).updateControls();
         }
         if (this.#moviesExtraPresenter.get(id)) {
-          this.#moviesExtraPresenter.get(id).updateControls();
+          this.#updateExtraLists();
         }
         if (this.#popupMovieId === id && this.#popupPresenter) {
           this.#popupPresenter.updateControls(movie.controls);
@@ -356,7 +356,6 @@ export default class BoardPresenter {
           this.#moviesPresenter.get(movieId).updateData(comments);
         }
         if (this.#moviesExtraPresenter.get(movieId)) {
-          this.#moviesExtraPresenter.get(movieId).updateData(comments);
           this.#updateExtraLists();
         }
 
