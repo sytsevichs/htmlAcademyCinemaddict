@@ -1,4 +1,4 @@
-import bodyView from '../view/body/body-view.js';
+import BodyView from '../view/body/body-view.js';
 import FooterStatisticsView from '../view/body/footer-statistics-view.js';
 import UserRankView from '../view/body/user-rank-view.js';
 import {render,replace,remove} from '../framework/render.js';
@@ -6,7 +6,7 @@ import { MoviesUpdateGroup } from '../utils/const.js';
 
 export default class BodyPresenter {
   #moviesModel;
-  #bodyComponent = new bodyView();
+  #bodyComponent = new BodyView();
   #userRankComponent = null;
   #footerStatisticsComponent = null;
 

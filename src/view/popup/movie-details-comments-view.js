@@ -48,18 +48,11 @@ export default class MovieDetailsCommentsView extends AbstractStatefulView {
     this.#timeAgo = new TimeAgo('en-US');
   }
 
-  static parseCommentsToState = (movieId,comments) => ({
-    comments: [...comments],
-    movieId: movieId,
-    isDeleting: null,
-  });
 
-  static parseStateToComments = (state) => state.comments;
+  get template() {
+    return createMovieCommentsContainerTemplate(this._state.comments, this._state.isDeleting, this.#timeAgo);
+  }
 
-  setHandlers = (callback) => {
-    this._callback.updateMovieComments = callback;
-    this.#setDeleteHandler();
-  };
 
   #setDeleteHandler = () => {
     this.element.querySelectorAll('.film-details__comment-delete').forEach((button) => button.addEventListener('click', this.#deleteCommentHandler));
@@ -91,7 +84,18 @@ export default class MovieDetailsCommentsView extends AbstractStatefulView {
     this.setHandlers(this._callback.updateMovieComments);
   };
 
-  get template() {
-    return createMovieCommentsContainerTemplate(this._state.comments, this._state.isDeleting, this.#timeAgo);
-  }
+  setHandlers = (callback) => {
+    this._callback.updateMovieComments = callback;
+    this.#setDeleteHandler();
+  };
+
+
+  static parseCommentsToState = (movieId,comments) => ({
+    comments: [...comments],
+    movieId: movieId,
+    isDeleting: null,
+  });
+
+  static parseStateToComments = (state) => state.comments;
+
 }

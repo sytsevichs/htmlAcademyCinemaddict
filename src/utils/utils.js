@@ -11,7 +11,7 @@ const isEscapeKey = (evt) => evt.key === 'Escape';
 const formatDateToYear = (date) => dayjs(date).format('YYYY');
 const formatDateDescription = (date) => dayjs(date).format('YYYY/MM/DD HH:MM');
 const formatMinutesToTime = (minutes) => dayjs.duration(minutes, 'minutes').format(minutes < MINUTES_IN_HOUR ? 'mm[m]' : 'H[h] mm[m]') ;
-const defineGenresDescrition = (amount) => amount === 1 ? 'Genre' : 'Genres';
+const defineGenresDescription = (amount) => amount === 1 ? 'Genre' : 'Genres';
 
 const updateItemByIndex = (items, updatedItem, index) => {
   if (index === -1) {
@@ -117,7 +117,7 @@ export {
   formatDateToYear,
   formatDateDescription,
   formatMinutesToTime,
-  defineGenresDescrition,
+  defineGenresDescription,
   updateItemById,
   updateItemByName,
   sortByDateUp,

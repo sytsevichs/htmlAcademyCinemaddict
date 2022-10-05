@@ -3,7 +3,7 @@ import MovieDetailsSectionView from '../view/popup/movie-details-section-view.js
 import MovieDetailsTopInfoView from '../view/popup/movie-details-top-info-view.js';
 import MovieDetailsTopContainerView from '../view/popup/movie-details-top-container-view.js';
 import MovieDetailsBottomContainerView from '../view/popup/movie-details-bottom-container-view.js';
-import MovieDetailsCloseButtomView from '../view/popup/movie-details-close-button-view.js';
+import MovieDetailsCloseButtonView from '../view/popup/movie-details-close-button-view.js';
 import MovieDetailsTopControlsView from '../view/popup/movie-details-top-controls-view.js';
 import MovieDetailsInnerView from '../view/popup/movie-details-inner-view.js';
 import bodyView from '../view/body/body-view.js';
@@ -56,7 +56,7 @@ export default class PopupPresenter {
   };
 
   #renderCloseButton = () => {
-    const movieDetailsCloseButtonComponent = new MovieDetailsCloseButtomView;
+    const movieDetailsCloseButtonComponent = new MovieDetailsCloseButtonView;
     render(movieDetailsCloseButtonComponent, this.#movieDetailsTopInfoComponent.element);
     movieDetailsCloseButtonComponent.setClickHandler(this.#closeDetailsView);
     this.#detailsElement = this.#movieDetailsSectionComponent.element;

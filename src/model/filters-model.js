@@ -60,11 +60,7 @@ export default class FilterModel extends Observer {
     }
     if (filterName === FilterType.all){
       this.#filters.forEach((filter) => {
-        if (filter.name === filterName) {
-          filter.active = true;
-        } else {
-          filter.active = false;
-        }
+        filter.active = filter.name === filterName;
       });
     }
     //Вызываем все обработчики, зарегистированные для обновления одного фильтра

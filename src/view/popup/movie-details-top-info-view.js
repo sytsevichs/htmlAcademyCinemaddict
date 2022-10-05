@@ -2,7 +2,7 @@ import AbstactView from '../../framework/view/abstract-view.js';
 import {
   formatDateDescription,
   formatMinutesToTime,
-  defineGenresDescrition
+  defineGenresDescription
 } from '../../utils/utils.js';
 
 const createMovieDetailsTopInfoTemplate = (movie) => {
@@ -58,7 +58,7 @@ const createMovieDetailsTopInfoTemplate = (movie) => {
             <td class="film-details__cell">${filmInfo.release.releaseCountry}</td>
           </tr>
           <tr class="film-details__row">
-            <td class="film-details__term">${defineGenresDescrition(filmInfo.genre.length)}</td>
+            <td class="film-details__term">${defineGenresDescription(filmInfo.genre.length)}</td>
             <td class="film-details__cell">
             ${Object.values(filmInfo.genre).map((genre) => `<span class="film-details__genre">${genre}</span>`)}
             </td>

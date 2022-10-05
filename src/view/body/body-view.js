@@ -1,4 +1,4 @@
-export default class bodyView {
+export default class BodyView {
   #element;
   constructor() {
     this.#element = document.querySelector('body');
